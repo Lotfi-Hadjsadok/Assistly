@@ -1,12 +1,16 @@
 import express from "express";
 import { loadUrl } from "./utils/loaders.js";
-import { splitter } from "./utils/splitter.js";
+import { splitter, shouldSplit } from "./utils/splitter.js";
 import { embeddings, model } from "./utils/models.js";
 import { PromptTemplate } from "@langchain/core/prompts";
 import dotenv from "dotenv";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { DocxLoader } from "@langchain/community/document_loaders/fs/docx";
+import { TextLoader } from "langchain/document_loaders/fs/text";
+import { CSVLoader } from "@langchain/community/document_loaders/fs/csv";
+
 import fs from "fs/promises";
 import multer from "multer";
 
@@ -29,8 +33,6 @@ router.post("/get/embedding", async (req, res) => {
 
 router.post("/get/response", async (req, res) => {
   const { query, vectors, language } = req.body;
-
-  console.log(vectors);
 
   const context = vectors.map((v) => v).join("\n");
 
@@ -113,7 +115,7 @@ router.post("/embed/website", async (req, res) => {
   const { url } = req.body;
   const docs = await loadUrl(url);
 
-  const chunks = await splitter.splitDocuments(docs);
+  const chunks = shouldSplit(docs) ? await splitter.splitDocuments(docs) : docs;
 
   const vectors = await Promise.all(
     chunks.map(async (chunk) => {
@@ -131,23 +133,53 @@ router.post("/embed/website", async (req, res) => {
 
 router.post("/embed/document", upload.single("file"), async (req, res) => {
   const file = req.file;
-  const loader = new PDFLoader(file.path);
-  const docs = await loader.load();
-  await fs.unlink(file.path);
-  const chunks = await splitter.splitDocuments(docs);
-  const vectors = await Promise.all(
-    chunks.map(async (chunk) => {
-      const embedding = await embeddings.embedQuery(chunk.pageContent);
-      return {
-        content: chunk.pageContent,
-        metadata: chunk.metadata,
-        source: chunk.metadata.source,
-        embedding,
-      };
-    })
-  );
+  let loader;
 
-  res.json({ vectors });
+  const ext = file.originalname.split(".").pop().toLowerCase();
+  switch (ext) {
+    case "pdf":
+      loader = new PDFLoader(file.path);
+      break;
+    case "doc":
+    case "docx":
+      loader = new DocxLoader(file.path, {
+        type: ext === "doc" ? "doc" : "docx",
+      });
+      break;
+    case "csv":
+      loader = new CSVLoader(file.path);
+      break;
+    case "txt":
+      loader = new TextLoader(file.path);
+      break;
+    default:
+      await fs.unlink(file.path);
+      return res.status(400).json({ error: "Unsupported file type" });
+  }
+
+  try {
+    const docs = await loader.load();
+    await fs.unlink(file.path);
+
+    const chunks = shouldSplit(docs, ext)
+      ? await splitter.splitDocuments(docs)
+      : docs;
+    const vectors = await Promise.all(
+      chunks.map(async (chunk) => {
+        const embedding = await embeddings.embedQuery(chunk.pageContent);
+        return {
+          content: chunk.pageContent,
+          metadata: chunk.metadata,
+          source: file.originalname,
+          embedding,
+        };
+      })
+    );
+    res.json({ vectors });
+  } catch (error) {
+    await fs.unlink(file.path);
+    res.status(500).json({ error: "Failed to process document" });
+  }
 });
 
 app.use(express.json());

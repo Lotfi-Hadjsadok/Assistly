@@ -30,8 +30,9 @@
             </div>
 
             <div>
-                <flux:input type="file" wire:model="document" accept=".pdf,.doc,.docx,.txt" />
-                <flux:text class="mt-2 text-sm text-muted">{{ __('Supported formats: PDF, DOC, DOCX, TXT (max 10MB)') }}
+                <flux:input type="file" wire:model="document" accept=".pdf,.doc,.docx,.txt,.csv" />
+                <flux:text class="mt-2 text-sm text-muted">
+                    {{ __('Supported formats: PDF, DOC, DOCX, TXT, CSV (max 10MB)') }}
                 </flux:text>
             </div>
 

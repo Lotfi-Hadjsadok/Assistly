@@ -12,17 +12,13 @@ export const loadUrl = async (url) => {
         },
       },
       maxRequestsPerCrawl: 10,
-      requestHandler: async ({ page, request, enqueueLinks }) => {
-        console.log("Processing:", request.url);
+      requestHandler: async ({ page, request }) => {
         const content = await page.locator("body").innerText();
         docs.push({
-          // pageContent: content.replace(/\s+/g, " ").trim(),
+          pageContent: content.replace(/\s+/g, " ").trim(),
           metadata: {
             source: request.url,
           },
-        });
-        await enqueueLinks({
-          strategy: "all",
         });
       },
     },

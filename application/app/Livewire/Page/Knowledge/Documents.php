@@ -35,7 +35,7 @@ class Documents extends Component
     public function addDocument()
     {
         $this->validate([
-            'document' => 'required|file|mimes:pdf,doc,docx,txt|max:10240', // 10MB max
+            'document' => 'required|file|mimes:pdf,doc,docx,txt,csv|max:10240', // 10MB max
         ]);
 
         $path = $this->document->store(path: 'documents');

@@ -1,17 +1,34 @@
-import { PuppeteerWebBaseLoader } from "@langchain/community/document_loaders/web/puppeteer";
+import { PlaywrightCrawler, Configuration } from "crawlee";
 
 export const loadUrl = async (url) => {
-  const loader = new PuppeteerWebBaseLoader(url, {
-    evaluate: async (page) => {
-      return await page.evaluate(() => {
-        return document.body.innerText.replace(/\s+/g, " ").trim();
-      });
+  let docs = [];
+
+  const loader = new PlaywrightCrawler(
+    {
+      launchContext: {
+        launchOptions: {
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          executablePath: process.env.CHROMIUM_PATH,
+        },
+      },
+      maxRequestsPerCrawl: 10,
+      requestHandler: async ({ page, request, enqueueLinks }) => {
+        console.log("Processing:", request.url);
+        const content = await page.locator("body").innerText();
+        docs.push({
+          // pageContent: content.replace(/\s+/g, " ").trim(),
+          metadata: {
+            source: request.url,
+          },
+        });
+        await enqueueLinks({
+          strategy: "all",
+        });
+      },
     },
-    launchOptions: {
-      executablePath: process.env.CHROMIUM_PATH,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    },
-  });
-  const docs = await loader.load();
+    new Configuration({ persistStorage: false })
+  );
+
+  await loader.run([url]);
   return docs;
 };

@@ -4,11 +4,14 @@ import { splitter } from "./utils/splitter.js";
 import { embeddings, model } from "./utils/models.js";
 import { PromptTemplate } from "@langchain/core/prompts";
 import dotenv from "dotenv";
-import {
-  RunnablePassthrough,
-  RunnableSequence,
-} from "@langchain/core/runnables";
+import { RunnableSequence } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import fs from "fs/promises";
+import multer from "multer";
+
+const upload = multer({ dest: "uploads/" });
+
 dotenv.config();
 const app = express();
 
@@ -106,8 +109,7 @@ router.post("/get/response", async (req, res) => {
   res.json(response);
 });
 
-router.post("/embed", async (req, res) => {
-  console.log(req.body);
+router.post("/embed/website", async (req, res) => {
   const { url } = req.body;
   const docs = await loadUrl(url);
 
@@ -124,6 +126,27 @@ router.post("/embed", async (req, res) => {
       };
     })
   );
+  res.json({ vectors });
+});
+
+router.post("/embed/document", upload.single("file"), async (req, res) => {
+  const file = req.file;
+  const loader = new PDFLoader(file.path);
+  const docs = await loader.load();
+  await fs.unlink(file.path);
+  const chunks = await splitter.splitDocuments(docs);
+  const vectors = await Promise.all(
+    chunks.map(async (chunk) => {
+      const embedding = await embeddings.embedQuery(chunk.pageContent);
+      return {
+        content: chunk.pageContent,
+        metadata: chunk.metadata,
+        source: chunk.metadata.source,
+        embedding,
+      };
+    })
+  );
+
   res.json({ vectors });
 });
 

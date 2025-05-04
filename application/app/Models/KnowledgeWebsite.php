@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\KnowledgeStatus;
 use App\Models\Embedding;
 use App\Services\TrainAIService;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ class KnowledgeWebsite extends Model
 
     protected $casts = [
         'trained_at' => 'datetime',
+        'status' => KnowledgeStatus::class,
     ];
 
 

@@ -62,7 +62,7 @@ class Documents extends Component
         $document = KnowledgeDocument::find($id);
         if ($document) {
             Storage::disk('local')->delete($document->path);
-            // $document->embeddings()->delete();
+            $document->embeddings()->delete();
             $document->delete();
 
             Flux::toast(

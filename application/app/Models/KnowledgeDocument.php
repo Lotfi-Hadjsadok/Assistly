@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Embedding;
+use App\Enums\KnowledgeStatus;
+use App\Services\TrainAIService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class KnowledgeDocument extends Model
 {
@@ -18,5 +21,22 @@ class KnowledgeDocument extends Model
 
     protected $casts = [
         'trained_at' => 'datetime',
+        'status' => KnowledgeStatus::class,
     ];
+
+
+    public function train()
+    {
+        $this->update([
+            'status' => 'training',
+        ]);
+
+        $trainAIService = app(TrainAIService::class);
+        $trainAIService->embedDocument($this);
+    }
+
+    public function embeddings()
+    {
+        return $this->morphMany(Embedding::class, 'source');
+    }
 }

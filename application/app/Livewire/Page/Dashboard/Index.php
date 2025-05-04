@@ -42,22 +42,22 @@ class Index extends Component
     //     dd($response->json());
     // }
 
-    public function embed()
-    {
-        $response = Http::post('assistly-ai-server:3000/api/v1/embed', [
-            'url' => 'https://confirmix.com',
-        ]);
-        $vectors = $response->json()['vectors'] ?? [];
-        if (empty($vectors)) {
-            return;
-        }
-        foreach ($vectors as $vector) {
-            $embedding = new Embedding();
-            $embedding->embedding = $vector['embedding'];
-            $embedding->content = $vector['content'];
-            $embedding->metadata = $vector['metadata'];
-            $embedding->source = $vector['source'];
-            $embedding->save();
-        }
-    }
+    // public function embed()
+    // {
+    //     $response = Http::post('assistly-ai-server:3000/api/v1/embed/website', [
+    //         'url' => 'https://confirmix.com',
+    //     ]);
+    //     $vectors = $response->json()['vectors'] ?? [];
+    //     if (empty($vectors)) {
+    //         return;
+    //     }
+    //     foreach ($vectors as $vector) {
+    //         $embedding = new Embedding();
+    //         $embedding->embedding = $vector['embedding'];
+    //         $embedding->content = $vector['content'];
+    //         $embedding->metadata = $vector['metadata'];
+    //         $embedding->source = $vector['source'];
+    //         $embedding->save();
+    //     }
+    // }
 }

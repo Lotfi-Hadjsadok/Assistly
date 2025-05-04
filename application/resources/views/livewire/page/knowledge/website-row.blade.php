@@ -9,8 +9,8 @@
         <flux:text class="text-sm">{{ $website->created_at->diffForHumans() }}</flux:text>
     </div>
     <div class="col-span-2 sm:col-span-2">
-        <flux:badge variant="pill" color="{{ $website->status == 'trained' ? 'green' : 'yellow' }}">
-            {{ $website->status }}
+        <flux:badge variant="pill" color="{{ $website->status->color() }}">
+            {{ $website->status->label() }}
         </flux:badge>
     </div>
     <div class="col-span-3 sm:col-span-2">

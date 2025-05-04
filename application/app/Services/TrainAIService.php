@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\Embedding;
 use App\Models\KnowledgeWebsite;
+use App\Models\KnowledgeDocument;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class TrainAIService
 {
@@ -17,7 +19,7 @@ class TrainAIService
     public function embedWebsite(KnowledgeWebsite $website)
     {
         try {
-            $response = Http::post(AI_SERVER_API . '/embed', [
+            $response = Http::post(AI_SERVER_API . '/embed/website', [
                 'url' => $website->url,
             ]);
             $vectors = $response->json()['vectors'] ?? [];
@@ -89,6 +91,44 @@ class TrainAIService
             return $response->json();
         } catch (\Exception $e) {
             Log::error('Error getting response: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function embedDocument(KnowledgeDocument $document)
+    {
+        try {
+            $file = Storage::disk('local')->get($document->path);
+            $response = Http::attach(
+                'file',
+                $file,
+                $document->file_name
+            )->post(AI_SERVER_API . '/embed/document');
+            $vectors = $response->json()['vectors'] ?? [];
+            if (empty($vectors)) {
+                return;
+            }
+            $embeddings = [];
+            foreach ($vectors as $vector) {
+                $embedding = new Embedding();
+                $embedding->embedding = $vector['embedding'];
+                $embedding->content = $vector['content'];
+                $embedding->metadata = $vector['metadata'];
+                $embeddings[] = $embedding;
+            }
+            $document->embeddings()->saveMany($embeddings);
+
+            $document->update([
+                'status' => 'trained',
+                'trained_at' => now(),
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error embedding document: ' . $e->getMessage());
+            $document->update([
+                'status' => 'failed',
+            ]);
             return false;
         }
     }

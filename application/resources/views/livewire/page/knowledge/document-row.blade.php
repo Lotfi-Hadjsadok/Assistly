@@ -12,8 +12,8 @@
         <flux:text>{{ $document->created_at->diffForHumans() }}</flux:text>
     </div>
     <div class="col-span-2">
-        <flux:badge variant="{{ $document->status === 'trained' ? 'success' : 'warning' }}">
-            {{ ucfirst($document->status) }}
+        <flux:badge variant="pill" color="{{ $document->status->color() }}">
+            {{ $document->status->label() }}
         </flux:badge>
     </div>
     <div class="col-span-2">

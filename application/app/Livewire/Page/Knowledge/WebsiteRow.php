@@ -16,7 +16,6 @@ class WebsiteRow extends Component
     public function trainWebsite()
     {
         $this->website->train();
-
         $this->website->refresh();
     }
 }

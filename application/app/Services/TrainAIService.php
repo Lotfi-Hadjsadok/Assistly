@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Embedding;
+use App\Models\KnowledgeWebsite;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+
+class TrainAIService
+{
+    public function __construct()
+    {
+        //
+    }
+
+    public function embedWebsite(KnowledgeWebsite $website)
+    {
+        try {
+            $response = Http::post(AI_SERVER_API . '/embed', [
+                'url' => $website->url,
+            ]);
+            $vectors = $response->json()['vectors'] ?? [];
+            if (empty($vectors)) {
+                return;
+            }
+            $embeddings = [];
+            foreach ($vectors as $vector) {
+                $embedding = new Embedding();
+                $embedding->embedding = $vector['embedding'];
+                $embedding->content = $vector['content'];
+                $embedding->metadata = $vector['metadata'];
+                $embeddings[] = $embedding;
+            }
+            $website->embeddings()->saveMany($embeddings);
+
+            $website->update([
+                'status' => 'trained',
+                'trained_at' => now(),
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error embedding website: ' . $e->getMessage());
+            $website->update([
+                'status' => 'failed',
+            ]);
+            return false;
+        }
+    }
+
+    public function getEmbedding($query)
+    {
+        try {
+            $response = Http::post(AI_SERVER_API . '/get/embedding', [
+                'query' => $query,
+            ]);
+            return $response->json();
+        } catch (\Exception $e) {
+            Log::error('Error getting embedding: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getVectorsOfSimilarity($query)
+    {
+        $vector = $this->getEmbedding($query);
+
+        if (empty($vector)) {
+            return [];
+        }
+
+        $vectors = Embedding::getVectorsOfSimilarity($vector)->pluck('content')->toArray();
+        return $vectors;
+    }
+
+    public function chat($query, $language = 'en')
+    {
+        try {
+            $vectors = $this->getVectorsOfSimilarity($query);
+            if (empty($vectors)) {
+                return false;
+            }
+            $response = Http::post(AI_SERVER_API . '/get/response', [
+                'query' => $query,
+                'vectors' => $vectors,
+                'language' => $language,
+            ]);
+            return $response->json();
+        } catch (\Exception $e) {
+            Log::error('Error getting response: ' . $e->getMessage());
+            return false;
+        }
+    }
+}

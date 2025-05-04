@@ -1,0 +1,7 @@
+models:
+  Embedding:
+    content: string
+    source: string
+    embedding: vector
+    metadata: json
+    

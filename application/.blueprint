@@ -1,0 +1,7 @@
+created:
+    - database/factories/EmbeddingFactory.php
+    - database/migrations/2025_04_27_061327_create_embeddings_table.php
+    - app/Models/Embedding.php
+models:
+    User: { name: string, email: string, email_verified_at: 'timestamp nullable', password: string, remember_token: 'string:100 nullable' }
+    Embedding: { content: string, source: string, embedding: vector, metadata: json }

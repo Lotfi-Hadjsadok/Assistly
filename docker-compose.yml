@@ -1,0 +1,48 @@
+services:
+  assistly-app:
+    container_name: assistly-app
+    build:
+      context: ./application
+      dockerfile: Dockerfile
+    volumes:
+      - ./application:/var/www/html
+      - ./application/public:/var/www/html/public
+      - /var/www/html/node_modules
+    ports:
+      - "81:8080"
+    environment:
+      - AUTORUN_ENABLED=true
+      - SSL_MODE=off
+      - FLUX_USERNAME=${FLUX_USERNAME}
+      - FLUX_PASSWORD=${FLUX_PASSWORD}
+    depends_on:
+      - assistly-db
+      - assistly-ai-server
+
+  assistly-db:
+    image: ankane/pgvector:latest
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    ports:
+      - "5432:5432"
+
+  assistly-ai-server:
+    build:
+      context: ./AIServer
+      dockerfile: Dockerfile
+    volumes:
+      - ./AIServer:/usr/src/app
+    ports:
+      - "3000:3000"
+    command: ["/bin/sh","/usr/src/app/start.sh"]
+
+  assistly-adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+
+volumes:
+  app-vendor:
+  app-node_modules:

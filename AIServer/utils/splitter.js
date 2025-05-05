@@ -1,5 +1,5 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-
+import { HtmlToTextTransformer } from "@langchain/community/document_transformers/html_to_text";
 export const splitter = new RecursiveCharacterTextSplitter({
   chunkSize: 1000,
   chunkOverlap: 100,
@@ -11,3 +11,5 @@ export const shouldSplit = (docs, ext = null) => {
   }
   return true;
 };
+
+export const htmlTransformer = new HtmlToTextTransformer();

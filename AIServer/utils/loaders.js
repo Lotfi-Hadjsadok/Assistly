@@ -13,9 +13,9 @@ export const loadUrl = async (url) => {
       },
       maxRequestsPerCrawl: 10,
       requestHandler: async ({ page, request }) => {
-        const content = await page.locator("body").innerText();
+        const content = await page.locator("body").innerHTML();
         docs.push({
-          pageContent: content.replace(/\s+/g, " ").trim(),
+          pageContent: content,
           metadata: {
             source: request.url,
           },
@@ -26,5 +26,6 @@ export const loadUrl = async (url) => {
   );
 
   await loader.run([url]);
+
   return docs;
 };

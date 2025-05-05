@@ -1,6 +1,6 @@
 import express from "express";
 import { loadUrl } from "./utils/loaders.js";
-import { splitter, shouldSplit } from "./utils/splitter.js";
+import { splitter, shouldSplit, htmlTransformer } from "./utils/splitter.js";
 import { embeddings, model } from "./utils/models.js";
 import { PromptTemplate } from "@langchain/core/prompts";
 import dotenv from "dotenv";
@@ -115,7 +115,13 @@ router.post("/embed/website", async (req, res) => {
   const { url } = req.body;
   const docs = await loadUrl(url);
 
-  const chunks = shouldSplit(docs) ? await splitter.splitDocuments(docs) : docs;
+  const chunks = shouldSplit(docs)
+    ? await htmlTransformer.pipe(splitter).invoke(docs)
+    : docs;
+
+  chunks.map((chunk) => {
+    chunk.pageContent = chunk.pageContent.replace(/\s+/g, " ").trim();
+  });
 
   const vectors = await Promise.all(
     chunks.map(async (chunk) => {

@@ -22,7 +22,7 @@ class TrainAIService
             $response = Http::post(AI_SERVER_API . '/embed/website', [
                 'url' => $website->url,
             ]);
-            $vectors = $response->json()['vectors'] ?? [];
+            $vectors = $response->json('data') ?? [];
             if (empty($vectors)) {
                 return;
             }
@@ -57,7 +57,7 @@ class TrainAIService
             $response = Http::post(AI_SERVER_API . '/get/embedding', [
                 'query' => $query,
             ]);
-            return $response->json();
+            return $response->json('data');
         } catch (\Exception $e) {
             Log::error('Error getting embedding: ' . $e->getMessage());
             return false;
@@ -66,14 +66,19 @@ class TrainAIService
 
     public function getVectorsOfSimilarity($query)
     {
-        $vector = $this->getEmbedding($query);
+        try {
+            $vector = $this->getEmbedding($query);
 
-        if (empty($vector)) {
-            return [];
+            if (empty($vector)) {
+                return [];
+            }
+
+            $vectors = Embedding::getVectorsOfSimilarity($vector)->pluck('content')->toArray();
+            return $vectors;
+        } catch (\Exception $e) {
+            Log::error('Error getting vectors of similarity: ' . $e->getMessage());
+            return false;
         }
-
-        $vectors = Embedding::getVectorsOfSimilarity($vector)->pluck('content')->toArray();
-        return $vectors;
     }
 
     public function chat($query, $language = 'en')
@@ -88,7 +93,7 @@ class TrainAIService
                 'vectors' => $vectors,
                 'language' => $language,
             ]);
-            return $response->json();
+            return $response->json('data');
         } catch (\Exception $e) {
             Log::error('Error getting response: ' . $e->getMessage());
             return false;
@@ -104,7 +109,7 @@ class TrainAIService
                 $file,
                 $document->file_name
             )->post(AI_SERVER_API . '/embed/document');
-            $vectors = $response->json()['vectors'] ?? [];
+            $vectors = $response->json('data') ?? [];
             if (empty($vectors)) {
                 return;
             }

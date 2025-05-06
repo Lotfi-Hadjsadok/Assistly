@@ -20,6 +20,7 @@ export const loadUrl = async (url) => {
             source: request.url,
           },
         });
+        await page.close();
       },
     },
     new Configuration({ persistStorage: false })

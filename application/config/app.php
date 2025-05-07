@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'aliases' => [
+        'KnowledgeStatus' => App\Enums\KnowledgeStatus::class,
+        'Str' => Illuminate\Support\Str::class,
+    ],
+
 ];

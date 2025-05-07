@@ -2,10 +2,12 @@ import { loadUrl } from "../utils/loaders.js";
 import { splitter, shouldSplit, htmlTransformer } from "../utils/splitter.js";
 import { embeddings } from "../utils/models.js";
 import { sendResponse, sendError } from "../utils/sendResponse.js";
+
 export const embedWebsite = async (req, res) => {
   try {
-    const { url } = req.body;
-    const docs = await loadUrl(url);
+    const { urls } = req.body;
+    console.log(urls);
+    const docs = await loadUrl(urls);
 
     const chunks = shouldSplit(docs)
       ? await htmlTransformer.pipe(splitter).invoke(docs)

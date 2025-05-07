@@ -2,21 +2,28 @@
 
 namespace App\Livewire\Page\Knowledge;
 
-use App\Models\Embedding;
 use Flux\Flux;
 use Livewire\Component;
+use App\Models\Embedding;
+use Livewire\Attributes\On;
 use App\Models\KnowledgeWebsite;
+use Illuminate\Support\Facades\Http;
+use App\Livewire\Forms\WebsiteKnowledgeForm;
 
 class Websites extends Component
 {
     public $websites = [];
     public $search = '';
+    public $selectedWebsite = null;
+    public WebsiteKnowledgeForm $form;
 
-    // Form fields
-    public $url = '';
-    public $title = '';
-    public $description = '';
+    public function openSettings($id)
+    {
+        $this->selectedWebsite = KnowledgeWebsite::find($id);
+        Flux::modal('knowledge-website-settings')->show();
+    }
 
+    #[On('refresh')]
     public function mount()
     {
         $this->websites = KnowledgeWebsite::all();
@@ -29,43 +36,32 @@ class Websites extends Component
 
     public function addWebsite()
     {
-        $this->validate([
-            'url' => [
-                'required',
-                'regex:/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}(\/[\w\-\/]*)?$/i',
-                'unique:knowledge_websites,url',
-            ],
-        ]);
-
-        $this->url = "https://{$this->url}";
-        KnowledgeWebsite::create([
-            'url' => $this->url,
-        ]);
-
-        // Reset form
-        $this->reset(['url']);
-
-        $this->websites = KnowledgeWebsite::all();
-        Flux::modal('add-website')->close();
+        $this->form->addWebsite();
+        $this->dispatch('refresh')->self();
     }
 
-    public function resetForm()
+    public function deleteWebsite(KnowledgeWebsite $website)
     {
-        $this->reset(['url']);
+        $this->form->deleteWebsite($website);
+        $this->selectedWebsite = null;
+        $this->dispatch('refresh')->self();
     }
 
-    public function deleteWebsite($id)
+    public function addToSiteMap(KnowledgeWebsite $website)
     {
-        $website = KnowledgeWebsite::find($id);
-        if ($website) {
-            $website->embeddings()->delete();
-            $website->delete();
+        $this->form->addToSiteMap($website);
+        $this->dispatch('refresh')->self();
+    }
 
-            Flux::toast(
-                text: 'Website deleted successfully',
-                variant: 'success'
-            );
-        }
-        $this->websites = KnowledgeWebsite::all();
+    public function removeFromSiteMap(KnowledgeWebsite $website, $page)
+    {
+        $this->form->removeFromSiteMap($website, $page);
+        $this->dispatch('refresh')->self();
+    }
+
+    public function trainWebsite(KnowledgeWebsite $website)
+    {
+        $this->form->trainWebsite($website);
+        $this->dispatch("refresh.{$website->id}")->to(WebsiteRow::class);
     }
 }

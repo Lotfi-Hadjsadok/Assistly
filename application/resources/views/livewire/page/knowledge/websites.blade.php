@@ -31,13 +31,13 @@
 
             <flux:input.group>
                 <flux:input.group.prefix>https://</flux:input.group.prefix>
-                <flux:input wire:model="url" placeholder="example.com" />
+                <flux:input wire:model="form.url" placeholder="example.com" />
             </flux:input.group>
 
             <div class="flex items-center gap-3">
                 <flux:spacer />
                 <flux:modal.close>
-                    <flux:button type="button" variant="ghost" wire:click="resetForm">
+                    <flux:button type="button" variant="ghost" wire:click="form.resetForm">
                         {{ __('Cancel') }}
                     </flux:button>
                 </flux:modal.close>
@@ -75,6 +75,8 @@
                 @foreach ($websites as $website)
                     <livewire:page.knowledge.website-row :key="$website->id" :website="$website" />
                 @endforeach
+
+                <x-websites.settings-modal :$selectedWebsite :$form />
             </div>
         @else
             {{-- Empty state --}}

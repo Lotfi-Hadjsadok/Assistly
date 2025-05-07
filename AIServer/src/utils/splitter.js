@@ -12,4 +12,21 @@ export const shouldSplit = (docs, ext = null) => {
   return true;
 };
 
-export const htmlTransformer = new HtmlToTextTransformer();
+export const htmlTransformer = new HtmlToTextTransformer({
+  selectors: [
+    {
+      selector: "a",
+      format: "skip",
+      options: {
+        ignoreHref: true,
+      },
+    },
+    {
+      selector: "img",
+      format: "skip",
+      options: {
+        ignoreHref: true,
+      },
+    },
+  ],
+});

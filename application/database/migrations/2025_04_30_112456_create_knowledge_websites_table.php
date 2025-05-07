@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('url');
             $table->string('status')->default('untrained');
+            $table->json('sitemap')->nullable();
             $table->timestamp('trained_at')->nullable();
             $table->timestamps();
         });

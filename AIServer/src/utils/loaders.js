@@ -1,32 +1,42 @@
-import { PlaywrightCrawler, Configuration } from "crawlee";
+import { PlaywrightWebBaseLoader } from "@langchain/community/document_loaders/web/playwright";
 
-export const loadUrl = async (url) => {
-  let docs = [];
+export async function loadUrl(urls) {
+  urls = urls.filter((page) => !page.trained).map((page) => page.url);
 
-  const loader = new PlaywrightCrawler(
-    {
-      launchContext: {
+  const docs = [];
+
+  for (const pageUrl of urls) {
+    console.log(pageUrl);
+    try {
+      const loader = new PlaywrightWebBaseLoader(pageUrl, {
         launchOptions: {
           args: ["--no-sandbox", "--disable-setuid-sandbox"],
           executablePath: process.env.CHROMIUM_PATH,
         },
-      },
-      maxRequestsPerCrawl: 10,
-      requestHandler: async ({ page, request }) => {
-        const content = await page.locator("body").innerHTML();
+        evaluate: (page, browser, response) => {
+          if (response.status() !== 200) {
+            page.close();
+            browser.close();
+          } else {
+            return page.content();
+          }
+        },
+      });
+
+      const loadedDocs = await loader.load();
+
+      for (const doc of loadedDocs) {
         docs.push({
-          pageContent: content,
+          pageContent: doc.pageContent,
           metadata: {
-            source: request.url,
+            source: pageUrl,
           },
         });
-        await page.close();
-      },
-    },
-    new Configuration({ persistStorage: false })
-  );
-
-  await loader.run([url]);
+      }
+    } catch (err) {
+      console.warn(`Error loading ${pageUrl}: ${err.message}`);
+    }
+  }
 
   return docs;
-};
+}

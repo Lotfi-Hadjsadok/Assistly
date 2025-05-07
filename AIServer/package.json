@@ -14,7 +14,6 @@
     "@langchain/community": "^0.3.41",
     "@langchain/core": "^0.3.49",
     "@langchain/openai": "^0.5.6",
-    "crawlee": "^3.13.2",
     "d3-dsv": "^2.0.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

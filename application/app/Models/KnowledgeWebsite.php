@@ -18,14 +18,18 @@ class KnowledgeWebsite extends Model
         'status' => KnowledgeStatus::class,
     ];
 
-
+    public function getSitemapAttribute($value)
+    {
+        return json_decode($value, true) ?? [];
+    }
 
     public function train()
     {
-        $this->update([
-            'status' => 'training',
-        ]);
-
+        if ($this->status != KnowledgeStatus::TRAINED) {
+            $this->update([
+                'status' => KnowledgeStatus::TRAINING,
+            ]);
+        }
         $trainAIService = app(TrainAIService::class);
         $trainAIService->embedWebsite($this);
     }

@@ -3,6 +3,7 @@
 namespace App\Livewire\Page\Knowledge;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\KnowledgeWebsite;
 
 class WebsiteRow extends Component
@@ -13,9 +14,9 @@ class WebsiteRow extends Component
         return view('livewire.page.knowledge.website-row');
     }
 
-    public function trainWebsite()
+    #[On('refresh.{website.id}')]
+    public function refresh()
     {
-        $this->website->train();
         $this->website->refresh();
     }
 }

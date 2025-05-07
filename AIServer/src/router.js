@@ -2,7 +2,6 @@ import express from "express";
 import { getEmbedding, getResponse } from "./controllers/assitantController.js";
 import { embedWebsite } from "./controllers/websiteKnowledgeController.js";
 import { embedDocument } from "./controllers/documentKnowledgeController.js";
-
 import upload from "./utils/mutler.js";
 
 const router = express.Router();

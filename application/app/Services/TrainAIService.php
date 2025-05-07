@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\KnowledgeStatus;
 use App\Models\Embedding;
 use App\Models\KnowledgeWebsite;
 use App\Models\KnowledgeDocument;
@@ -19,8 +20,19 @@ class TrainAIService
     public function embedWebsite(KnowledgeWebsite $website)
     {
         try {
-            $response = Http::post(AI_SERVER_API . '/embed/website', [
+            $sitemap = $website->sitemap;
+            $urls[] = [
                 'url' => $website->url,
+                'trained' => $website->status == KnowledgeStatus::TRAINED,
+            ];
+            foreach ($sitemap as $page) {
+                $urls[] = [
+                    'url' => $page['url'],
+                    'trained' => $page['trained'],
+                ];
+            }
+            $response = Http::post(AI_SERVER_API . '/embed/website', [
+                'urls' => $urls,
             ]);
             $vectors = $response->json('data') ?? [];
             if (empty($vectors)) {
@@ -35,8 +47,17 @@ class TrainAIService
                 $embeddings[] = $embedding;
             }
             $website->embeddings()->saveMany($embeddings);
-
+            if ($website->sitemap) {
+                $sitemap = [];
+                foreach ($website->sitemap as $page) {
+                    $sitemap[] = [
+                        'url' => $page['url'],
+                        'trained' => true,
+                    ];
+                }
+            }
             $website->update([
+                'sitemap' => $sitemap,
                 'status' => 'trained',
                 'trained_at' => now(),
             ]);

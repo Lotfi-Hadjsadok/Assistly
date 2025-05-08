@@ -16,6 +16,7 @@
                     {{ $selectedWebsite?->url }}
                 </flux:text>
             </div>
+
             @foreach ($selectedWebsite?->sitemap ?? [] as $page)
                 <div class="flex justify-between mt-2 items-center">
                     <flux:text>
@@ -23,11 +24,13 @@
                     </flux:text>
                     <flux:button.group>
                         <flux:button size="xs" icon="trash" variant="subtle"
-                            wire:click="removeFromSiteMap({{ $selectedWebsite?->id }},'{{ $page['url'] }}')" />
+                            wire:click="removeFromSiteMap('{{ $page['url'] }}')" />
                         @if ($page['trained'])
-                            <flux:icon variant="solid" name="check" class="text-success" />
+                            <flux:icon variant="solid" size="xs" name="check"
+                                class="text-success size-5! mt-0.5!" />
                         @else
-                            <flux:icon variant="solid" name="x-mark" class="text-danger" />
+                            <flux:icon variant="solid" size="xs" name="x-mark"
+                                class="text-danger size-5! mt-0.5!" />
                         @endif
                     </flux:button.group>
                 </div>

@@ -1,12 +1,13 @@
 import { PlaywrightWebBaseLoader } from "@langchain/community/document_loaders/web/playwright";
 
 export async function loadUrl(urls) {
-  urls = urls.filter((page) => !page.trained).map((page) => page.url);
-
   const docs = [];
+  console.log(urls);
+  urls.forEach((url) => {
+    console.log(url);
+  });
 
   for (const pageUrl of urls) {
-    console.log(pageUrl);
     try {
       const loader = new PlaywrightWebBaseLoader(pageUrl, {
         launchOptions: {

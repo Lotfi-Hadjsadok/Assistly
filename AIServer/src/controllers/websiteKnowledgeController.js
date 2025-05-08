@@ -6,7 +6,6 @@ import { sendResponse, sendError } from "../utils/sendResponse.js";
 export const embedWebsite = async (req, res) => {
   try {
     const { urls } = req.body;
-    console.log(urls);
     const docs = await loadUrl(urls);
 
     const chunks = shouldSplit(docs)

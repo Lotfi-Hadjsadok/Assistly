@@ -16,22 +16,56 @@ class KnowledgeWebsite extends Model
     protected $casts = [
         'trained_at' => 'datetime',
         'status' => KnowledgeStatus::class,
+        'sitemap' => 'array',
     ];
+
+    protected $wasTrained;
 
     public function getSitemapAttribute($value)
     {
-        return json_decode($value, true) ?? [];
+        return $value ? json_decode($value, true) : [];
     }
+
+    public function getHasToTrainAttribute()
+    {
+        return $this->status !== KnowledgeStatus::TRAINED
+            || collect($this->sitemap)->some(fn($page) => !$page['trained']);
+    }
+
+    public function setWasTrainedAttribute($value)
+    {
+        $this->wasTrained = $value;
+    }
+
+    public function getWasTrainedAttribute()
+    {
+        return $this->wasTrained;
+    }
+
 
     public function train()
     {
-        if ($this->status != KnowledgeStatus::TRAINED) {
-            $this->update([
-                'status' => KnowledgeStatus::TRAINING,
-            ]);
-        }
+        $this->wasTrained = $this->status == KnowledgeStatus::TRAINED;
+        $this->status = KnowledgeStatus::TRAINING;
+        $this->save();
         $trainAIService = app(TrainAIService::class);
         $trainAIService->embedWebsite($this);
+    }
+
+    public function setTrained()
+    {
+        $updatedSitemap = collect($this->sitemap)->map(function ($page) {
+            return [
+                'url' => $page['url'],
+                'trained' => true,
+            ];
+        })->all();
+
+        $this->update([
+            'sitemap' => $updatedSitemap,
+            'status' => KnowledgeStatus::TRAINED,
+            'trained_at' => now(),
+        ]);
     }
 
     public function embeddings()

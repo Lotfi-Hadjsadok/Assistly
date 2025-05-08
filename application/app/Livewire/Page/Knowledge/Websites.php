@@ -40,28 +40,25 @@ class Websites extends Component
         $this->dispatch('refresh')->self();
     }
 
-    public function deleteWebsite(KnowledgeWebsite $website)
+    #[On('setSelectedWebsite')]
+    public function setSelectedWebsite($id)
     {
-        $this->form->deleteWebsite($website);
-        $this->selectedWebsite = null;
-        $this->dispatch('refresh')->self();
+        $this->selectedWebsite = KnowledgeWebsite::find($id);
+        Flux::modal('knowledge-website-settings')->show();
     }
 
-    public function addToSiteMap(KnowledgeWebsite $website)
+
+    public function addToSiteMap()
     {
-        $this->form->addToSiteMap($website);
+        $this->form->addToSiteMap($this->selectedWebsite);
         $this->dispatch('refresh')->self();
+        $this->dispatch('refresh.' . $this->selectedWebsite->id)->to(WebsiteRow::class);
     }
 
-    public function removeFromSiteMap(KnowledgeWebsite $website, $page)
+    public function removeFromSiteMap($page)
     {
-        $this->form->removeFromSiteMap($website, $page);
+        $this->form->removeFromSiteMap($this->selectedWebsite, $page);
         $this->dispatch('refresh')->self();
-    }
-
-    public function trainWebsite(KnowledgeWebsite $website)
-    {
-        $this->form->trainWebsite($website);
-        $this->dispatch("refresh.{$website->id}")->to(WebsiteRow::class);
+        $this->dispatch('refresh.' . $this->selectedWebsite->id)->to(WebsiteRow::class);
     }
 }

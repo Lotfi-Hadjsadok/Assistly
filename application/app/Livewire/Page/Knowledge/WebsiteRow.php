@@ -2,13 +2,18 @@
 
 namespace App\Livewire\Page\Knowledge;
 
+use Flux\Flux;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use App\Enums\KnowledgeStatus;
 use App\Models\KnowledgeWebsite;
+use App\Livewire\Forms\WebsiteKnowledgeForm;
 
 class WebsiteRow extends Component
 {
     public KnowledgeWebsite $website;
+    public WebsiteKnowledgeForm $form;
+
     public function render()
     {
         return view('livewire.page.knowledge.website-row');
@@ -18,5 +23,22 @@ class WebsiteRow extends Component
     public function refresh()
     {
         $this->website->refresh();
+    }
+
+    public function openSettings()
+    {
+        $this->dispatch('setSelectedWebsite', id: $this->website->id)->to('page.knowledge.websites');
+    }
+
+    public function deleteWebsite()
+    {
+        $this->form->deleteWebsite($this->website);
+        $this->dispatch('refresh')->to('page.knowledge.websites');
+    }
+
+    public function trainWebsite()
+    {
+        $this->form->trainWebsite($this->website);
+        $this->dispatch("refresh.{$this->website->id}")->self();
     }
 }

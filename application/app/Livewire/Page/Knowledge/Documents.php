@@ -9,6 +9,7 @@ use App\Models\KnowledgeWebsite;
 use App\Models\KnowledgeDocument;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\On;
 
 class Documents extends Component
 {
@@ -70,6 +71,12 @@ class Documents extends Component
                 variant: 'success'
             );
         }
+        $this->documents = KnowledgeDocument::all();
+    }
+
+    #[On('documentDeleted')]
+    public function refreshDocuments()
+    {
         $this->documents = KnowledgeDocument::all();
     }
 }

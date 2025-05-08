@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Page\Knowledge;
 
-use App\Models\Embedding;
-use App\Models\KnowledgeDocument;
 use Flux\Flux;
-use Illuminate\Support\Facades\Http;
 use Livewire\Component;
+use App\Models\Embedding;
+use App\Enums\KnowledgeStatus;
+use App\Models\KnowledgeDocument;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentRow extends Component
@@ -25,7 +26,26 @@ class DocumentRow extends Component
 
     public function trainDocument()
     {
+        if ($this->document->status == KnowledgeStatus::TRAINING) {
+            return;
+        }
         $this->document->train();
         $this->document->refresh();
+    }
+
+    public function deleteDocument()
+    {
+        $document = $this->document;
+        if ($document) {
+            \Illuminate\Support\Facades\Storage::disk('local')->delete($document->path);
+            $document->embeddings()->delete();
+            $document->delete();
+
+            \Flux\Flux::toast(
+                text: 'Document deleted successfully',
+                variant: 'success'
+            );
+        }
+        $this->dispatch('documentDeleted')->to('page.knowledge.documents');
     }
 }

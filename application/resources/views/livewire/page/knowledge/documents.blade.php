@@ -44,7 +44,7 @@
                     </flux:button>
                 </flux:modal.close>
 
-                <flux:button variant="primary" type="submit">
+                <flux:button wire:loading.attr='disabled' wire:target='_startUpload' variant="primary" type="submit">
                     {{ __('Upload Document') }}
                 </flux:button>
             </div>

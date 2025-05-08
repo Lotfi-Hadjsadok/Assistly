@@ -20,47 +20,45 @@ class TrainAIService
     public function embedWebsite(KnowledgeWebsite $website)
     {
         try {
-            $sitemap = $website->sitemap;
-            $urls[] = [
-                'url' => $website->url,
-                'trained' => $website->status == KnowledgeStatus::TRAINED,
-            ];
-            foreach ($sitemap as $page) {
-                $urls[] = [
+            $urls = collect($website->sitemap ?? [])
+                ->prepend([
+                    'url' => $website->url,
+                    'trained' => $website->was_trained,
+                ])
+                ->map(fn($page) => [
                     'url' => $page['url'],
                     'trained' => $page['trained'],
-                ];
+                ])
+                ->filter(fn($page) => !$page['trained'])
+                ->pluck('url')
+                ->values()
+                ->all();
+
+            if (empty($urls)) {
+                $website->setTrained();
+                return;
             }
+
             $response = Http::post(AI_SERVER_API . '/embed/website', [
                 'urls' => $urls,
             ]);
+
             $vectors = $response->json('data') ?? [];
+
             if (empty($vectors)) {
                 return;
             }
-            $embeddings = [];
-            foreach ($vectors as $vector) {
-                $embedding = new Embedding();
-                $embedding->embedding = $vector['embedding'];
-                $embedding->content = $vector['content'];
-                $embedding->metadata = $vector['metadata'];
-                $embeddings[] = $embedding;
-            }
+
+            $embeddings = collect($vectors)->map(function ($vector) {
+                return new Embedding([
+                    'embedding' => $vector['embedding'],
+                    'content' => $vector['content'],
+                    'metadata' => $vector['metadata'],
+                ]);
+            });
+
             $website->embeddings()->saveMany($embeddings);
-            if ($website->sitemap) {
-                $sitemap = [];
-                foreach ($website->sitemap as $page) {
-                    $sitemap[] = [
-                        'url' => $page['url'],
-                        'trained' => true,
-                    ];
-                }
-            }
-            $website->update([
-                'sitemap' => $sitemap,
-                'status' => 'trained',
-                'trained_at' => now(),
-            ]);
+            $website->setTrained();
 
             return true;
         } catch (\Exception $e) {

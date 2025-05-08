@@ -12,8 +12,14 @@
         <flux:text>{{ $document->created_at->diffForHumans() }}</flux:text>
     </div>
     <div class="col-span-2">
-        <flux:badge variant="pill" color="{{ $document->status->color() }}">
+        <flux:badge wire:loading.remove wire:target="trainDocument"
+            icon="{{ $document->status == KnowledgeStatus::TRAINING ? 'loading' : null }}" variant="pill"
+            color="{{ $document->status->color() }}">
             {{ $document->status->label() }}
+        </flux:badge>
+        <flux:badge wire:loading.flex wire:target="trainDocument" icon="loading" variant="pill"
+            color="{{ KnowledgeStatus::TRAINING->color() }}">
+            {{ KnowledgeStatus::TRAINING->label() }}
         </flux:badge>
     </div>
     <div class="col-span-2">
@@ -24,13 +30,15 @@
             <flux:button variant="ghost" icon="ellipsis-vertical" />
 
             <flux:menu>
-                <flux:menu.item wire:click="trainDocument" class="hover:bg-success/20! hover:text-success!"
-                    icon="brain">
-                    Train
-                </flux:menu.item>
-                <flux:menu.separator />
+                @if ($document->status != KnowledgeStatus::TRAINED)
+                    <flux:menu.item wire:loading.remove wire:target='trainDocument' wire:click="trainDocument"
+                        class="hover:bg-success/20! hover:text-success!" icon="brain">
+                        Train
+                    </flux:menu.item>
+                    <flux:menu.separator wire:loading.remove wire:target='trainDocument' />
+                @endif
                 <flux:menu.item wire:confirm="Are you sure you want to delete this document?"
-                    wire:click="$parent.deleteDocument({{ $document->id }})" icon="trash" variant="danger">
+                    wire:click="deleteDocument" icon="trash" variant="danger">
                     Delete
                 </flux:menu.item>
             </flux:menu>

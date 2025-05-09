@@ -32,12 +32,14 @@ class WebsiteRow extends Component
 
     public function deleteWebsite()
     {
+        $this->authorize('delete', $this->website);
         $this->form->deleteWebsite($this->website);
         $this->dispatch('refresh')->to('page.knowledge.websites');
     }
 
     public function trainWebsite()
     {
+        $this->authorize('update', $this->website);
         $this->form->trainWebsite($this->website);
         $this->dispatch("refresh.{$this->website->id}")->self();
     }

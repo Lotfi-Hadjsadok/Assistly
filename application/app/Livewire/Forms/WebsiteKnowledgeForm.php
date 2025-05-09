@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Models\Embedding;
 use Flux\Flux;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Form;
 use App\Models\KnowledgeWebsite;
 use Livewire\Attributes\Validate;
@@ -27,9 +28,12 @@ class WebsiteKnowledgeForm extends Form
 
         $this->url = "https://{$this->url}";
 
-        KnowledgeWebsite::create([
-            'url' => $this->url,
-        ]);
+
+        Auth::user()->websites()->create(
+            [
+                'url' => $this->url
+            ]
+        );
 
         $this->reset(['url']);
         Flux::modal('add-website')->close();

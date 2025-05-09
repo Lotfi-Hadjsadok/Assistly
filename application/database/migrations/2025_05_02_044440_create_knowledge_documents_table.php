@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('knowledge_documents', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('path');
             $table->string('file_name');
             $table->string('status')->default('untrained');

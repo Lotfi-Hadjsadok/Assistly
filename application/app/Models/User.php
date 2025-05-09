@@ -45,4 +45,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function websites()
+    {
+        return $this->hasMany(KnowledgeWebsite::class);
+    }
+
+    public function embeddings()
+    {
+        return $this->hasMany(Embedding::class);
+    }
 }

@@ -49,11 +49,12 @@ class TrainAIService
                 return;
             }
 
-            $embeddings = collect($vectors)->map(function ($vector) {
+            $embeddings = collect($vectors)->map(function ($vector) use ($website) {
                 return new Embedding([
                     'embedding' => $vector['embedding'],
                     'content' => $vector['content'],
                     'metadata' => $vector['metadata'],
+                    'user_id' => $website->user_id,
                 ]);
             });
 

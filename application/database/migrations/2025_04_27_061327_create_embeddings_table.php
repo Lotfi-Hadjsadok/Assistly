@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('embeddings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->longText('content');
             $table->morphs('source');
             $table->vector('embedding');

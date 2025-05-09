@@ -4,10 +4,9 @@ namespace App\Livewire\Page\Knowledge;
 
 use Flux\Flux;
 use Livewire\Component;
-use App\Models\Embedding;
 use Livewire\Attributes\On;
 use App\Models\KnowledgeWebsite;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\Forms\WebsiteKnowledgeForm;
 
 class Websites extends Component
@@ -19,14 +18,14 @@ class Websites extends Component
 
     public function openSettings($id)
     {
-        $this->selectedWebsite = KnowledgeWebsite::find($id);
+        $this->selectedWebsite = Auth::user()->websites()->where('id', $id)->first();
         Flux::modal('knowledge-website-settings')->show();
     }
 
     #[On('refresh')]
     public function mount()
     {
-        $this->websites = KnowledgeWebsite::all();
+        $this->websites = Auth::user()->websites;
     }
 
     public function render()
@@ -43,13 +42,14 @@ class Websites extends Component
     #[On('setSelectedWebsite')]
     public function setSelectedWebsite($id)
     {
-        $this->selectedWebsite = KnowledgeWebsite::find($id);
+        $this->authorize('update', $this->selectedWebsite);
         Flux::modal('knowledge-website-settings')->show();
     }
 
 
     public function addToSiteMap()
     {
+        $this->authorize('update', $this->selectedWebsite);
         $this->form->addToSiteMap($this->selectedWebsite);
         $this->dispatch('refresh')->self();
         $this->dispatch('refresh.' . $this->selectedWebsite->id)->to(WebsiteRow::class);
@@ -57,6 +57,7 @@ class Websites extends Component
 
     public function removeFromSiteMap($page)
     {
+        $this->authorize('update', $this->selectedWebsite);
         $this->form->removeFromSiteMap($this->selectedWebsite, $page);
         $this->dispatch('refresh')->self();
         $this->dispatch('refresh.' . $this->selectedWebsite->id)->to(WebsiteRow::class);

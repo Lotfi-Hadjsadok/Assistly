@@ -33,7 +33,7 @@
         </flux:navlist>
 
         <flux:dropdown position="top" align="left" class="max-lg:hidden">
-            <flux:profile name="Lotfi Hadjsadok" />
+            <flux:profile name="{{ auth()->user()->name }}" />
 
             <flux:menu>
                 <flux:menu.radio.group>
@@ -53,7 +53,7 @@
 
         <flux:spacer />
 
-        <flux:profile name="Lotfi Hadjsadok" />
+        <flux:profile name="{{ auth()->user()->name }}" />
     </flux:header>
 
     <flux:main container class="max-w-xl lg:max-w-3xl">

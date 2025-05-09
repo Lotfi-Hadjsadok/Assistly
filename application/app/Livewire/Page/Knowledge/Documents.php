@@ -2,14 +2,15 @@
 
 namespace App\Livewire\Page\Knowledge;
 
-use App\Models\Embedding;
 use Flux\Flux;
 use Livewire\Component;
+use App\Models\Embedding;
+use Livewire\Attributes\On;
+use Livewire\WithFileUploads;
 use App\Models\KnowledgeWebsite;
 use App\Models\KnowledgeDocument;
-use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\On;
 
 class Documents extends Component
 {
@@ -23,9 +24,11 @@ class Documents extends Component
     public $title = '';
     public $description = '';
 
+
+    #[On('refresh')]
     public function mount()
     {
-        $this->documents = KnowledgeDocument::all();
+        $this->documents = Auth::user()->documents;
     }
 
     public function render()
@@ -41,42 +44,19 @@ class Documents extends Component
 
         $path = $this->document->store(path: 'documents');
 
-        KnowledgeDocument::create([
+        Auth::user()->documents()->create([
             'path' => $path,
             'file_name' => $this->document->getClientOriginalName(),
         ]);
 
         // Reset form
         $this->reset(['document']);
-
-        $this->documents = KnowledgeDocument::all();
+        $this->dispatch('refresh')->self();
         Flux::modal('add-document')->close();
     }
 
     public function resetForm()
     {
         $this->reset(['document']);
-    }
-
-    public function deleteDocument($id)
-    {
-        $document = KnowledgeDocument::find($id);
-        if ($document) {
-            Storage::disk('local')->delete($document->path);
-            $document->embeddings()->delete();
-            $document->delete();
-
-            Flux::toast(
-                text: 'Document deleted successfully',
-                variant: 'success'
-            );
-        }
-        $this->documents = KnowledgeDocument::all();
-    }
-
-    #[On('documentDeleted')]
-    public function refreshDocuments()
-    {
-        $this->documents = KnowledgeDocument::all();
     }
 }

@@ -9,7 +9,7 @@
     {{-- Search and filters section --}}
     <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div class="w-full">
-            <flux:input wire:model.live="search" placeholder="Search knowledge..." icon="search" clearable />
+            <flux:input wire:model.live="search" placeholder="{{ __('Search knowledge...') }}" icon="search" clearable />
         </div>
         <div class="flex gap-4 w-full sm:w-auto">
             <flux:modal.trigger name="add-website">
@@ -59,16 +59,16 @@
             <div class="grid gap-4">
                 <div class="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 bg-muted/50 rounded-lg">
                     <div class="col-span-3">
-                        <flux:text class="text-sm font-medium">KNOWLEDGE</flux:text>
+                        <flux:text class="text-sm font-medium">{{ __('KNOWLEDGE') }}</flux:text>
                     </div>
                     <div class="col-span-3">
-                        <flux:text class="text-sm font-medium">ADDED</flux:text>
+                        <flux:text class="text-sm font-medium">{{ __('ADDED') }}</flux:text>
                     </div>
                     <div class="col-span-2">
-                        <flux:text class="text-sm font-medium">TRAINED</flux:text>
+                        <flux:text class="text-sm font-medium">{{ __('TRAINED') }}</flux:text>
                     </div>
                     <div class="col-span-2">
-                        <flux:text class="text-sm font-medium">TRAINED</flux:text>
+                        <flux:text class="text-sm font-medium">{{ __('TRAINED') }}</flux:text>
                     </div>
                 </div>
 

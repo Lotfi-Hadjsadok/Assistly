@@ -16,7 +16,6 @@ export const htmlTransformer = new HtmlToTextTransformer({
   selectors: [
     {
       selector: "a",
-      format: "skip",
       options: {
         ignoreHref: true,
       },

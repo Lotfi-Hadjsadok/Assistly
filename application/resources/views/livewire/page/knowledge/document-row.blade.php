@@ -33,13 +33,13 @@
                 @if ($document->status != KnowledgeStatus::TRAINED)
                     <flux:menu.item wire:loading.remove wire:target='trainDocument' wire:click="trainDocument"
                         class="hover:bg-success/20! hover:text-success!" icon="brain">
-                        Train
+                        {{ __('Train') }}
                     </flux:menu.item>
                     <flux:menu.separator wire:loading.remove wire:target='trainDocument' />
                 @endif
                 <flux:menu.item wire:confirm="Are you sure you want to delete this document?"
                     wire:click="deleteDocument" icon="trash" variant="danger">
-                    Delete
+                    {{ __('Delete') }}
                 </flux:menu.item>
             </flux:menu>
         </flux:dropdown>

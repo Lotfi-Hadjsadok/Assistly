@@ -27,6 +27,7 @@ class WebsiteRow extends Component
 
     public function openSettings()
     {
+        $this->authorize('update', $this->website);
         $this->dispatch('setSelectedWebsite', id: $this->website->id)->to('page.knowledge.websites');
     }
 
@@ -39,6 +40,9 @@ class WebsiteRow extends Component
 
     public function trainWebsite()
     {
+        if ($this->website->hasToTrain) {
+            return;
+        }
         $this->authorize('update', $this->website);
         $this->form->trainWebsite($this->website);
         $this->dispatch("refresh.{$this->website->id}")->self();

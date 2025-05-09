@@ -139,6 +139,7 @@ class TrainAIService
                 $embedding->embedding = $vector['embedding'];
                 $embedding->content = $vector['content'];
                 $embedding->metadata = $vector['metadata'];
+                $embedding->user_id = $document->user_id;
                 $embeddings[] = $embedding;
             }
             $document->embeddings()->saveMany($embeddings);

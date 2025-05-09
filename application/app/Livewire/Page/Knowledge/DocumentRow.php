@@ -4,11 +4,8 @@ namespace App\Livewire\Page\Knowledge;
 
 use Flux\Flux;
 use Livewire\Component;
-use App\Models\Embedding;
 use App\Enums\KnowledgeStatus;
 use App\Models\KnowledgeDocument;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 class DocumentRow extends Component
 {
@@ -26,6 +23,7 @@ class DocumentRow extends Component
 
     public function trainDocument()
     {
+        $this->authorize('update', $this->document);
         if ($this->document->status == KnowledgeStatus::TRAINING) {
             return;
         }
@@ -35,6 +33,7 @@ class DocumentRow extends Component
 
     public function deleteDocument()
     {
+        $this->authorize('delete', $this->document);
         $document = $this->document;
         if ($document) {
             \Illuminate\Support\Facades\Storage::disk('local')->delete($document->path);
@@ -46,6 +45,6 @@ class DocumentRow extends Component
                 variant: 'success'
             );
         }
-        $this->dispatch('documentDeleted')->to('page.knowledge.documents');
+        $this->dispatch('refresh')->to('page.knowledge.documents');
     }
 }

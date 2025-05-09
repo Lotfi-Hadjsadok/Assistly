@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->hasMany(KnowledgeWebsite::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(KnowledgeDocument::class);
+    }
+
     public function embeddings()
     {
         return $this->hasMany(Embedding::class);

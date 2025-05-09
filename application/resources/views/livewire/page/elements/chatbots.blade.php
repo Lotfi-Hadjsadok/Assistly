@@ -22,7 +22,7 @@
                 @if ($isTyping)
                     <div class="flex justify-start">
                         <div class="bg-gray-100 dark:bg-surface  rounded-lg px-4 py-2">
-                            <flux:text>Typing...</flux:text>
+                            <flux:text>{{ __('Typing...') }}</flux:text>
                         </div>
                     </div>
                 @endif

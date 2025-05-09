@@ -16,6 +16,8 @@ class Websites extends Component
     public $selectedWebsite = null;
     public WebsiteKnowledgeForm $form;
 
+
+    #[On('setSelectedWebsite')]
     public function openSettings($id)
     {
         $this->selectedWebsite = Auth::user()->websites()->where('id', $id)->first();
@@ -26,6 +28,7 @@ class Websites extends Component
     public function mount()
     {
         $this->websites = Auth::user()->websites;
+        $this->selectedWebsite = null;
     }
 
     public function render()
@@ -38,14 +41,6 @@ class Websites extends Component
         $this->form->addWebsite();
         $this->dispatch('refresh')->self();
     }
-
-    #[On('setSelectedWebsite')]
-    public function setSelectedWebsite($id)
-    {
-        $this->authorize('update', $this->selectedWebsite);
-        Flux::modal('knowledge-website-settings')->show();
-    }
-
 
     public function addToSiteMap()
     {

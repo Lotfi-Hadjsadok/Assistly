@@ -6,8 +6,8 @@
     <flux:tab.group>
 
         <flux:tabs>
-            <flux:tab name="pages">Pages</flux:tab>
-            <flux:tab name="settings">Settings</flux:tab>
+            <flux:tab name="pages">{{ __('Pages') }}</flux:tab>
+            <flux:tab name="settings">{{ __('Settings') }}</flux:tab>
         </flux:tabs>
 
         <flux:tab.panel name="pages">
@@ -36,7 +36,8 @@
                 </div>
             @endforeach
             <form class="flex gap-2 items-center mt-5" wire:submit="addToSiteMap({{ $selectedWebsite?->id }})">
-                <flux:input class="w-40!" placeholder="/new-page" size="xs" wire:model="form.newPage" />
+                <flux:input class="w-40!" placeholder="{{ __('/new-page') }}" size="xs"
+                    wire:model="form.newPage" />
                 <flux:button type="submit" variant="subtle" size="sm" icon="plus">
                 </flux:button>
             </form>

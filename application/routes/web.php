@@ -1,14 +1,23 @@
 <?php
 
+use App\Livewire\Page\Login;
+use App\Livewire\Page\Elements;
+use App\Livewire\Page\Register;
 use App\Livewire\Page\Dashboard;
 use App\Livewire\Page\Knowledge;
-use App\Livewire\Page\Elements;
-use App\Livewire\Page\Login;
-use App\Livewire\Page\Register;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
 Route::group(['middleware' => ['auth']], function () {
+
+    // Logout
+    Route::get('/logout', function () {
+        Auth::logout();
+        return redirect()->route('login');
+    })->name('logout');
+
+
     // Route::get('/', Home\Index::class);
     Route::get('/dashboard', Dashboard\Index::class)->name('dashboard');
     // Knowledge

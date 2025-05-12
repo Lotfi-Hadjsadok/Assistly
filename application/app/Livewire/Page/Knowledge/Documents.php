@@ -4,13 +4,9 @@ namespace App\Livewire\Page\Knowledge;
 
 use Flux\Flux;
 use Livewire\Component;
-use App\Models\Embedding;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
-use App\Models\KnowledgeWebsite;
-use App\Models\KnowledgeDocument;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class Documents extends Component
 {

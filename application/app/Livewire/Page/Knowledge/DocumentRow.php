@@ -6,6 +6,7 @@ use Flux\Flux;
 use Livewire\Component;
 use App\Enums\KnowledgeStatus;
 use App\Models\KnowledgeDocument;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentRow extends Component
 {
@@ -34,17 +35,14 @@ class DocumentRow extends Component
     public function deleteDocument()
     {
         $this->authorize('delete', $this->document);
-        $document = $this->document;
-        if ($document) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($document->path);
-            $document->embeddings()->delete();
-            $document->delete();
+        Storage::disk('local')->delete($this->document->path);
+        $this->document->embeddings()->delete();
+        $this->document->delete();
 
-            \Flux\Flux::toast(
-                text: 'Document deleted successfully',
-                variant: 'success'
-            );
-        }
+        Flux::toast(
+            text: 'Document deleted successfully',
+            variant: 'success'
+        );
         $this->dispatch('refresh')->to('page.knowledge.documents');
     }
 }

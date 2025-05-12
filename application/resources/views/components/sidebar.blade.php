@@ -21,7 +21,11 @@
 
             <flux:navlist.group heading="{{ __('Elements') }}" class="mt-4">
                 <flux:navlist.item icon="chat-bubble-bottom-center-text" href="{{ route('elements.chatbots') }}">
-                    {{ __('Chat Bots') }}</flux:navlist.item>
+                    {{ __('Chatbots') }}</flux:navlist.item>
+
+                <flux:navlist.item icon="chat-bubble-bottom-center-text" href="{{ route('elements.chatbots.test') }}">
+                    {{ __('Chat Test') }}</flux:navlist.item>
+
             </flux:navlist.group>
         </flux:navlist>
 
@@ -57,7 +61,7 @@
         <flux:profile name="{{ auth()->user()->name }}" />
     </flux:header>
 
-    <flux:main container class="max-w-xl lg:max-w-3xl">
+    <flux:main class="max-w-xl lg:max-w-7xl">
         {{ $slot }}
     </flux:main>
 </div>

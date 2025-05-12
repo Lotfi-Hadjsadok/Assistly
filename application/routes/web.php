@@ -8,7 +8,6 @@ use App\Livewire\Page\Knowledge;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
 Route::group(['middleware' => ['auth']], function () {
 
     // Logout
@@ -24,7 +23,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/knowledge/websites', Knowledge\Websites::class)->name('knowledge.websites');
     Route::get('/knowledge/documents', Knowledge\Documents::class)->name('knowledge.documents');
     // Elements
+    Route::get('/elements/chatbots/add', Elements\Chatbots\AddChatbot::class)->name('elements.chatbots.add');
     Route::get('/elements/chatbots', Elements\Chatbots::class)->name('elements.chatbots');
+    Route::get('/elements/chatbots/test', Elements\ChatbotsTest::class)->name('elements.chatbots.test');
 });
 
 

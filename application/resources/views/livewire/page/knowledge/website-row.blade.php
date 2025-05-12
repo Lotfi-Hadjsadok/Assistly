@@ -13,7 +13,7 @@
             wire:target="trainWebsite" variant="pill" color="{{ $website->status->color() }}">
             {{ $website->status->label() }}
         </flux:badge>
-        <flux:badge icon="loading" wire:loading.flex wire:target="trainWebsite" variant="pill"
+        <flux:badge class="w-fit!" icon="loading" wire:loading.flex wire:target="trainWebsite" variant="pill"
             color="{{ KnowledgeStatus::TRAINING->color() }}">
             {{ KnowledgeStatus::TRAINING->label() }}
         </flux:badge>

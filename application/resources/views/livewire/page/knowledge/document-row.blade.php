@@ -12,12 +12,12 @@
         <flux:text>{{ $document->created_at->diffForHumans() }}</flux:text>
     </div>
     <div class="col-span-2">
-        <flux:badge wire:loading.remove wire:target="trainDocument"
+        <flux:badge class="w-fit!" wire:loading.remove wire:target="trainDocument"
             icon="{{ $document->status == KnowledgeStatus::TRAINING ? 'loading' : null }}" variant="pill"
             color="{{ $document->status->color() }}">
             {{ $document->status->label() }}
         </flux:badge>
-        <flux:badge wire:loading.flex wire:target="trainDocument" icon="loading" variant="pill"
+        <flux:badge wire:loading.flex class="w-fit!" wire:target="trainDocument" icon="loading" variant="pill"
             color="{{ KnowledgeStatus::TRAINING->color() }}">
             {{ KnowledgeStatus::TRAINING->label() }}
         </flux:badge>

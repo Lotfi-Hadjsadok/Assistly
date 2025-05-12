@@ -1,8 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-
-
 @custom-variant dark (&:where(.dark, .dark *));
+
+
+@theme {
+    --font-sans: Inter, sans-serif;
+}
 
 /* Re-assign Flux's gray of choice... */
 @theme {
@@ -20,8 +24,8 @@
 }
 
 @theme {
-    --color-accent: var(--color-cyan-600);
-    --color-accent-content: var(--color-cyan-600);
+    --color-accent: var(--color-blue-600);
+    --color-accent-content: var(--color-blue-600);
     --color-accent-foreground: var(--color-white);
     --color-surface: var(--color-slate-50);
     --color-surface-dark: var(--color-slate-200);
@@ -32,8 +36,8 @@
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-cyan-600);
-        --color-accent-content: var(--color-cyan-400);
+        --color-accent: var(--color-blue-600);
+        --color-accent-content: var(--color-blue-400);
         --color-accent-foreground: var(--color-white);
         --color-surface: var(--color-slate-900);
         --color-surface-dark: var(--color-slate-950);
@@ -43,6 +47,14 @@
     }
 }
 
+@utility right-to-left {
+        direction: rtl;
+}
+
 button {
     cursor: pointer;
+}
+
+input{
+   @apply border-none! hover:outline-none active:outline-none focus:outline-none;
 }

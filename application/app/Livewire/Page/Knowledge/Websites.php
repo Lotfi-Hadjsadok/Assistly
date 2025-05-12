@@ -28,7 +28,20 @@ class Websites extends Component
     public function mount()
     {
         $this->websites = Auth::user()->websites;
+    }
+
+    #[On('websiteDeleted')]
+    public function websiteDeleted()
+    {
         $this->selectedWebsite = null;
+        $this->dispatch('refresh')->self();
+    }
+
+    public function deleteWebsite(KnowledgeWebsite $website)
+    {
+        $website->delete();
+        $this->selectedWebsite = null;
+        $this->dispatch('refresh')->self();
     }
 
     public function render()

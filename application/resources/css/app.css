@@ -58,3 +58,8 @@ button {
 input{
    @apply border-none! hover:outline-none active:outline-none focus:outline-none;
 }
+
+*{
+    scrollbar-color: var(--color-zinc-600) var(--color-zinc-100);
+    scrollbar-width:thin;
+}

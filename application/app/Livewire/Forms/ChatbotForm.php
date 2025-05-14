@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Livewire\Page\Elements\Chatbots;
+namespace App\Livewire\Forms;
 
-use Livewire\Component;
+use Livewire\Form;
+use App\Models\Chatbot;
 use Illuminate\Support\Facades\Auth;
 
-class AddChatbot extends Component
+class ChatbotForm extends Form
 {
-
+    public ?Chatbot $chatbot;
     public $settings;
+    public $name;
+    public $description;
     public $messages = [];
 
     public $colors = [
@@ -34,21 +37,18 @@ class AddChatbot extends Component
     ];
 
 
-
-
-
-    public function mount()
+    public function init(?Chatbot $chatbot = null)
     {
         $user = Auth::user();
-        $this->settings = [
+        $this->chatbot = $chatbot;
+        $this->name =  $chatbot->name ?? __("Untitled");
+        $this->settings =  $chatbot->settings ?? [
             "headline" => __("Chat with our AI"),
             "description" => __("Ask any question and our AI will answer!"),
             "welcome_message" => __("Hi there 👋 
 I'm the AI Assistant.
 
 How can I help you today?"),
-            "has_welcome_message_popup" => false,
-            "has_collect_name_and_email" => false,
             "brand_color" => "#0092b8",
             "theme" => "light",
             "orientation" => "left",
@@ -66,11 +66,32 @@ How can I help you today?"),
                 'role' => 'user',
                 'content' => "Hi there 👋 
 Am {$user->name}"
+            ],
+            [
+                'role' => 'assistant',
+                'content' => "Hi {$user->name} 👋 
+How can I help you today?"
             ]
-];
-    }   
-    public function render()
+        ];
+    }
+
+
+    public function update()
     {
-        return view('livewire.page.elements.chatbots.add-chatbot');
+        $this->chatbot->update([
+            'name' => $this->name,
+            'settings' => $this->settings,
+        ]);
+    }
+
+
+    public function create()
+    {
+        $bot = Auth::user()->chatbots()->create([
+            'name' => $this->name,
+            'settings' => $this->settings,
+        ]);
+
+        return $bot;
     }
 }

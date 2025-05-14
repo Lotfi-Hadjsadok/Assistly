@@ -9,6 +9,7 @@ export async function loadUrl(urls) {
 
   for (const pageUrl of urls) {
     try {
+      console.log(pageUrl);
       const loader = new PlaywrightWebBaseLoader(pageUrl, {
         launchOptions: {
           args: ["--no-sandbox", "--disable-setuid-sandbox"],

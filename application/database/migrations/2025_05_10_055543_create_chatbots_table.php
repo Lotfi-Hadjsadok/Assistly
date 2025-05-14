@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('chatbots', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users');
             $table->string('name');
             $table->json('settings');
             $table->timestamps();

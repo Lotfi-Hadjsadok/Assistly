@@ -9,27 +9,11 @@ use Illuminate\Auth\Access\Response;
 class ChatbotPolicy
 {
     /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
-        return false;
-    }
-
-    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Chatbot $chatbot): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return false;
+        return $user->id === $chatbot->user_id;
     }
 
     /**
@@ -37,7 +21,7 @@ class ChatbotPolicy
      */
     public function update(User $user, Chatbot $chatbot): bool
     {
-        return false;
+        return $user->id === $chatbot->user_id;
     }
 
     /**
@@ -45,7 +29,7 @@ class ChatbotPolicy
      */
     public function delete(User $user, Chatbot $chatbot): bool
     {
-        return false;
+        return $user->id === $chatbot->user_id;
     }
 
     /**
@@ -53,7 +37,7 @@ class ChatbotPolicy
      */
     public function restore(User $user, Chatbot $chatbot): bool
     {
-        return false;
+        return $user->id === $chatbot->user_id;
     }
 
     /**
@@ -61,6 +45,6 @@ class ChatbotPolicy
      */
     public function forceDelete(User $user, Chatbot $chatbot): bool
     {
-        return false;
+        return $user->id === $chatbot->user_id;
     }
 }

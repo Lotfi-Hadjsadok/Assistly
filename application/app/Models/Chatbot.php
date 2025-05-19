@@ -22,7 +22,7 @@ class Chatbot extends Model
     }
 
 
-    public function session()
+    public function sessions()
     {
         return $this->hasMany(ChatbotSession::class);
     }

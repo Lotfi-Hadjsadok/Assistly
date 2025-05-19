@@ -83,7 +83,6 @@ export const getResponse = async (req, res) => {
       language,
     });
 
-    console.log(response);
     sendResponse(res, response, "Success", 200);
   } catch (error) {
     console.log(error);

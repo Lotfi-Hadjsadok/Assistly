@@ -26,9 +26,7 @@
     };
 @endphp
 
-<div x-data="{
-    showChat: {{ $preview ? 'true' : 'false' }}
-}"
+<div wire:ignore x-data="chatbot"
     style="height: {{ $height }}; width: {{ $width }};min-width: {{ $width }};"
     class="flex-col flex relative justify-end">
     <div x-cloak x-transition x-show="showChat"
@@ -60,19 +58,17 @@
 
 
         </div>
-
-        <div class="p-5 space-y-4 flex-1 overflow-auto">
-            @foreach ($messages as $index => $message)
-                <x-chatbots.chatbot.message :$size :content="$message['content']" :role="$message['role']" :chatbot="$chatbot"
-                    :preview="$preview" :is_welcome_message="true" />
-            @endforeach
+        <div x-ref="messagesContainer" class="overflow-auto">
+            <x-chatbots.chatbot.messages :$size :$messages :$chatbot :$preview />
         </div>
 
-        <div class="p-2 bottom-0 flex flex-col justify-between left-0  bg-gray-100 right-0">
+        <form @submit.prevent="sendMessage"
+            class="p-2 bottom-0 flex flex-col justify-between left-0  bg-gray-100 right-0">
             <flux:card class="bg-white! p-0! ring-1! ring-gray-300/50! flex  items-center justify-between w-full">
-                <flux:input class:input="text-black!" class="p-1" size="{{ $size }}"
-                    placeholder="Type your message here..." />
-                <flux:button icon="paper-airplane" size="{{ $size }}" class="text-black!" variant="ghost" />
+                <flux:input autocomplete="off" x-model="message" wire:model="message" class:input="text-black!"
+                    class="p-1" size="{{ $size }}" placeholder="Type your message here..." />
+                <flux:button type="submit" icon="paper-airplane" size="{{ $size }}" class="text-black!"
+                    variant="ghost" />
             </flux:card>
             <div class="flex gap-1 items-center  justify-center mt-2">
                 <flux:text class="text-gray-500 text-[10px]">
@@ -84,7 +80,7 @@
             </div>
             <div>
             </div>
-        </div>
+        </form>
     </div>
 
     <div @class([
@@ -92,8 +88,12 @@
         'justify-end' => $chatbot->settings['orientation'] == 'right',
         'justify-start' => $chatbot->settings['orientation'] == 'left',
     ])
-        @if ($preview) :class="$wire.$parent.chatbotForm.settings.orientation == 'right' ? 'justify-end' : 'justify-start'" @endif>
-        <button @click="showChat = !showChat"
+        @if ($preview) :class="$wire.$parent.chatbotForm.settings.orientation == 'right' ? 'justify-end!' : 'justify-start!'" @endif>
+        <button
+            @click="showChat = !showChat;
+        await $nextTick();
+        $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight
+        "
             @if ($preview) :style="{
                 background: $wire.$parent.chatbotForm.settings.brand_color
             }" @endif
@@ -104,3 +104,28 @@
         </button>
     </div>
 </div>
+
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('chatbot', () => {
+            return {
+                message: '',
+                loading: @json($loading),
+                showChat: @json($preview),
+                async sendMessage() {
+                    if (this.loading) return;
+                    this.$dispatch('sendMessage', {
+                        content: this.message,
+                        role: 'user'
+                    });
+                    this.loading = true;
+                    this.message = '';
+                    const response = await this.$wire.sendMessage();
+                    this.$dispatch('sendMessage', response)
+                    this.loading = false;
+                }
+            }
+        });
+    });
+</script>

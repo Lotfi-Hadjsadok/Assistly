@@ -15,9 +15,10 @@ class Chatbots extends Component
     public $defaultSettings;
 
 
-    public function newChatbot(){
-       $bot = $this->form->create();
-       $this->redirect(route('elements.chatbots.edit', $bot->id), navigate: true);
+    public function newChatbot()
+    {
+        $bot = $this->form->create();
+        $this->redirect(route('elements.chatbots.edit', $bot->id));
     }
 
     #[On('refresh')]

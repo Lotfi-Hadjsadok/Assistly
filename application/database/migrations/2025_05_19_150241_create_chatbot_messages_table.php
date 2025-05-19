@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('chatbot_messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('chatbot_session_id')->constrained('chatbot_sessions');
+            $table->foreignId('chatbot_session_id')->constrained('chatbot_sessions')->onDelete('cascade');
             $table->string('role');
             $table->text('content');
             $table->timestamps();

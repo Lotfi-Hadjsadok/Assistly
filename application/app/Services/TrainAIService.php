@@ -101,7 +101,7 @@ class TrainAIService
         }
     }
 
-    public function chat($query, $language = 'en')
+    public function ask($query, $language = 'en')
     {
         try {
             $vectors = $this->getVectorsOfSimilarity($query);

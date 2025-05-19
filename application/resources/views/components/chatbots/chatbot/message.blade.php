@@ -38,15 +38,15 @@ $iconSize = match ($size) {
             'rounded-tl-xl! ' => $role === 'user',
             'rounded-tr-xl!' => $role === 'assistant',
         ])>
-        <div x-data="{
-            msg: {{ $preview && $is_welcome_message ? '$wire.$parent.chatbotForm.settings.welcome_message' : '`' . $content . '`' }}
-        }" x-html="msg" :class="'whitespace-pre-line'" @class([
-            $sizeClass,
-            'text-white! rounded-tl-xl!' => $role === 'user',
-            'text-black!' => $role === 'assistant',
-        ])>
+        <div @if ($is_welcome_message) x-effect="msg = $wire.$parent.chatbotForm.settings.welcome_message" @endif
+            x-data="{
+                msg: {{ $preview && $is_welcome_message ? '$wire.$parent.chatbotForm.settings.welcome_message' : '`' . $content . '`' }}
+            }" x-html="msg" :class="'whitespace-pre-line'" @class([
+                $sizeClass,
+                'text-white! rounded-tl-xl!' => $role === 'user',
+                'text-black!' => $role === 'assistant',
+            ])>
             {!! nl2br($content) !!}
         </div>
-
     </div>
 </div>

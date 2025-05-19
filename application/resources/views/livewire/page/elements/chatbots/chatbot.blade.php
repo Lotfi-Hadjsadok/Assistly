@@ -62,13 +62,9 @@
         </div>
 
         <div class="p-5 space-y-4 flex-1 overflow-auto">
-            <div class="flex gap-4 group ">
-                <x-chatbots.chatbot.message :$size :content="$chatbot->settings['welcome_message']" :role="'assistant'" :chatbot="$chatbot"
-                    :preview="$preview" :is_welcome_message="true" />
-            </div>
-            @foreach ($chatbot->messages as $index => $message)
+            @foreach ($messages as $index => $message)
                 <x-chatbots.chatbot.message :$size :content="$message['content']" :role="$message['role']" :chatbot="$chatbot"
-                    :preview="$preview" />
+                    :preview="$preview" :is_welcome_message="true" />
             @endforeach
         </div>
 

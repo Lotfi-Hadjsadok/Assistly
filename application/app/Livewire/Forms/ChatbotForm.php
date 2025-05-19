@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use Livewire\Form;
 use App\Models\Chatbot;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class ChatbotForm extends Form
@@ -90,6 +91,7 @@ How can I help you today?"
         $bot = Auth::user()->chatbots()->create([
             'name' => $this->name,
             'settings' => $this->settings,
+            'slug' => Str::uuid(),
         ]);
 
         return $bot;

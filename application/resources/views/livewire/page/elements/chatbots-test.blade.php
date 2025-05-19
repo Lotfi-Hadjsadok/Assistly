@@ -35,7 +35,8 @@
 @endphp
 <div class="relative">
     <div class="fixed bottom-0 right-0 flex items-end p-5 h-full">
-        <x-chatbots.chatbot size="xs" height="70%" width="350px" :$chatbot :preview="false" />
+        <livewire:page.elements.chatbots.chatbot size="xs" height="70%" width="350px" :$chatbot
+            :preview="false" />
     </div>
 
 </div>

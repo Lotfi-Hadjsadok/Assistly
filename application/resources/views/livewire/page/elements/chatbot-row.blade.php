@@ -15,7 +15,7 @@
         <flux:dropdown>
             <flux:button variant="ghost" icon="ellipsis-vertical" />
             <flux:menu>
-                <flux:menu.item href="{{ route('elements.chatbots.edit', $chatbot->id) }}" wire:navigate icon="cog"
+                <flux:menu.item href="{{ route('elements.chatbots.edit', $chatbot->id) }}" icon="cog"
                     class="hover:bg-primary/20! hover:text-primary!">
                     {{ __('Settings') }}
                 </flux:menu.item>

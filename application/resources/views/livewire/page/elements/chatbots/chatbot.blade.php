@@ -1,4 +1,3 @@
-@props(['chatbot', 'preview', 'height' => '100%', 'width' => '450px', 'size' => 'sm'])
 @php
     $size = match ($size) {
         'xs' => 'xs',
@@ -32,21 +31,21 @@
 }"
     style="height: {{ $height }}; width: {{ $width }};min-width: {{ $width }};"
     class="flex-col flex relative justify-end">
-    <div x-transition x-show="showChat"
-        class="relative flex-col flex justify-between overflow-hidden h-full bg-white! p-0! border-none rounded-3xl!">
+    <div x-cloak x-transition x-show="showChat"
+        class="relative flex flex-col  justify-between overflow-hidden h-full bg-white! p-0! border-none rounded-3xl!">
         <div @if ($preview) :style="{
-            background: 'linear-gradient(to right, ' + normalizeHex($wire.chatbotForm.settings.brand_color) + ', ' +
-                normalizeHex($wire.chatbotForm.settings.brand_color) + 'B3)'
+            background: 'linear-gradient(to right, ' + normalizeHex($wire.$parent.chatbotForm.settings.brand_color) + ', ' +
+                normalizeHex($wire.$parent.chatbotForm.settings.brand_color) + 'B3)'
         }" @endif
             style="background: linear-gradient(to right, {{ normalizeHex($chatbot->settings['brand_color']) }}, {{ normalizeHex($chatbot->settings['brand_color']) }}B3)"
             class="space-y-4 p-8 text-center">
             <flux:heading>
                 <span class="{{ $headlineSize }}"
-                    @if ($preview) wire:text='chatbotForm.settings.headline' @endif>{{ $chatbot->settings['headline'] }}</span>
+                    @if ($preview) wire:text='$parent.chatbotForm.settings.headline' @endif>{{ $chatbot->settings['headline'] }}</span>
             </flux:heading>
             <flux:text class="text-white">
                 <span class="{{ $descriptionSize }}"
-                    @if ($preview) wire:text='chatbotForm.settings.description' @endif>{{ $chatbot->settings['description'] }}</span>
+                    @if ($preview) wire:text='$parent.chatbotForm.settings.description' @endif>{{ $chatbot->settings['description'] }}</span>
             </flux:text>
             <div>
                 <flux:button icon="chat-bubble-bottom-center-text" variant="primary"
@@ -97,10 +96,10 @@
         'justify-end' => $chatbot->settings['orientation'] == 'right',
         'justify-start' => $chatbot->settings['orientation'] == 'left',
     ])
-        @if ($preview) :class="$wire.chatbotForm.settings.orientation == 'right' ? 'justify-end' : 'justify-start'" @endif>
+        @if ($preview) :class="$wire.$parent.chatbotForm.settings.orientation == 'right' ? 'justify-end' : 'justify-start'" @endif>
         <button @click="showChat = !showChat"
             @if ($preview) :style="{
-                background: $wire.chatbotForm.settings.brand_color
+                background: $wire.$parent.chatbotForm.settings.brand_color
             }" @endif
             style="background: {{ $chatbot->settings['brand_color'] }}"
             class="w-fit p-4 mt-4 rounded-full flex items-center justify-center">

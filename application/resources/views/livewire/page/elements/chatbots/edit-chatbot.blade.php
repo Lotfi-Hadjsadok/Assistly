@@ -47,6 +47,6 @@
 
 
     <!-- Begin Chatbot Preview -->
-    <x-chatbots.chatbot :chatbot="$chatbotForm" :preview="true" />
+    <livewire:page.elements.chatbots.chatbot :chatbot="$chatbotForm" :preview="true" />
     <!-- End Chatbot Preview -->
 </div>

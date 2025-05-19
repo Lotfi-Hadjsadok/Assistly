@@ -22,7 +22,7 @@ $iconSize = match ($size) {
 ])>
     @if ($role === 'assistant')
         <div @if ($preview) :style="{
-            background: $wire.chatbotForm.settings.brand_color
+            background: $wire.$parent.chatbotForm.settings.brand_color
         }" @endif
             style="background: {{ $chatbot->settings['brand_color'] }}"
             class="w-fit h-fit p-2 rounded-full flex items-center justify-center">
@@ -39,7 +39,7 @@ $iconSize = match ($size) {
             'rounded-tr-xl!' => $role === 'assistant',
         ])>
         <div x-data="{
-            msg: {{ $preview && $is_welcome_message ? '$wire.chatbotForm.settings.welcome_message' : '`' . $content . '`' }}
+            msg: {{ $preview && $is_welcome_message ? '$wire.$parent.chatbotForm.settings.welcome_message' : '`' . $content . '`' }}
         }" x-html="msg" :class="'whitespace-pre-line'" @class([
             $sizeClass,
             'text-white! rounded-tl-xl!' => $role === 'user',

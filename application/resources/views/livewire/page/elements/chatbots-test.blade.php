@@ -33,9 +33,5 @@
         ],
     ];
 @endphp
-<div class="relative">
-    <div class="fixed bottom-0 right-0 flex items-end p-5 h-full">
-        <iframe src="http://localhost:81/embed/chatbot" width="350" height="70%" style="border:none;"></iframe>
-    </div>
-
-</div>
+<iframe style="position: fixed;bottom:0;right:0;align-items:end;height:100%;width:100%;padding:20px" width="100%"
+    height="100%" src="{{ route('chatbot.embed', ['chatbot' => 5]) }}"></iframe>

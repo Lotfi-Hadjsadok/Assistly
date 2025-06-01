@@ -37,7 +37,7 @@
         }" @endif
             style="background: linear-gradient(to right, {{ normalizeHex($chatbot->settings['brand_color']) }}, {{ normalizeHex($chatbot->settings['brand_color']) }}B3)"
             class="space-y-4 p-8 text-center">
-            <flux:heading>
+            <flux:heading class="text-white">
                 <span class="{{ $headlineSize }}"
                     @if ($preview) wire:text='$parent.chatbotForm.settings.headline' @endif>{{ $chatbot->settings['headline'] }}</span>
             </flux:heading>
@@ -58,7 +58,7 @@
 
 
         </div>
-        <div x-ref="messagesContainer" class="overflow-auto">
+        <div x-ref="messagesContainer" class="overflow-auto flex-1">
             <x-chatbots.chatbot.messages :$size :$messages :$chatbot :$preview />
         </div>
 

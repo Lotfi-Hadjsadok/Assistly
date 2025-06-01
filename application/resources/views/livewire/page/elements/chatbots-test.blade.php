@@ -35,8 +35,7 @@
 @endphp
 <div class="relative">
     <div class="fixed bottom-0 right-0 flex items-end p-5 h-full">
-        <livewire:page.elements.chatbots.chatbot size="xs" height="70%" width="350px" :$chatbot
-            :preview="false" />
+        <iframe src="http://localhost:81/embed/chatbot" width="350" height="70%" style="border:none;"></iframe>
     </div>
 
 </div>

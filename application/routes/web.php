@@ -31,3 +31,6 @@ Route::group(['middleware' => ['auth']], function () {
 
 Route::get('/login', Login\Index::class)->name('login');
 Route::get('/register', Register\Index::class)->name('register');
+Route::get('/embed/chatbot', function () {
+    return view('livewire.page.elements.chatbots.chatbot-embed');
+})->name('chatbot.embed');

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use App\Models\Embedding;
 use App\Enums\KnowledgeStatus;
 use App\Services\TrainAIService;
@@ -28,15 +29,20 @@ class KnowledgeDocument extends Model
     public function train()
     {
         $this->update([
-            'status' => 'training',
+            'status' => KnowledgeStatus::TRAINING,
         ]);
 
         $trainAIService = app(TrainAIService::class);
-        $trainAIService->embedDocument($this);
+        return $trainAIService->embedDocument($this);
     }
 
     public function embeddings()
     {
         return $this->morphMany(Embedding::class, 'source');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

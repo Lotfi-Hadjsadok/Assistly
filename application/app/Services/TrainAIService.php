@@ -41,10 +41,19 @@ class TrainAIService
 
             $response = Http::post(AI_SERVER_API . '/embed/website', [
                 'urls' => $urls,
+                'knowledgeCredits' => $website->user->knowledge_credits,
             ]);
-
-            $vectors = $response->json('data') ?? [];
-
+            if ($response->failed()) {
+                $website->update([
+                    'status' => 'failed',
+                ]);
+                return [
+                    'error' => $response->json('message'),
+                ];
+            }
+            $data = $response->json('data') ?? [];
+            $vectors = $data['vectors'] ?? [];
+            $leftCredit = $data['leftCredit'] ?? 0;
             if (empty($vectors)) {
                 return;
             }
@@ -60,7 +69,9 @@ class TrainAIService
 
             $website->embeddings()->saveMany($embeddings);
             $website->setTrained();
-
+            $website->user->update([
+                'knowledge_credits' => $leftCredit,
+            ]);
             return true;
         } catch (\Exception $e) {
             Log::error('Error embedding website: ' . $e->getMessage());
@@ -128,8 +139,22 @@ class TrainAIService
                 'file',
                 $file,
                 $document->file_name
-            )->post(AI_SERVER_API . '/embed/document');
-            $vectors = $response->json('data') ?? [];
+            )->post(AI_SERVER_API . '/embed/document', [
+                'knowledgeCredits' => $document->user->knowledge_credits,
+            ]);
+
+            if ($response->failed()) {
+                $document->update([
+                    'status' => 'failed',
+                ]);
+                return [
+                    'error' => $response->json('message'),
+                ];
+            }
+
+            $data = $response->json('data') ?? [];
+            $vectors = $data['vectors'] ?? [];
+            $leftCredit = $data['leftCredit'] ?? 0;
             if (empty($vectors)) {
                 return;
             }
@@ -147,6 +172,10 @@ class TrainAIService
             $document->update([
                 'status' => 'trained',
                 'trained_at' => now(),
+            ]);
+
+            $document->user->update([
+                'knowledge_credits' => $leftCredit,
             ]);
 
             return true;

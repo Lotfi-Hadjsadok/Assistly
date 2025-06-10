@@ -2,10 +2,6 @@ import { PlaywrightWebBaseLoader } from "@langchain/community/document_loaders/w
 
 export async function loadUrl(urls) {
   const docs = [];
-  console.log(urls);
-  urls.forEach((url) => {
-    console.log(url);
-  });
 
   for (const pageUrl of urls) {
     try {
@@ -35,6 +31,7 @@ export async function loadUrl(urls) {
           },
         });
       }
+
     } catch (err) {
       console.warn(`Error loading ${pageUrl}: ${err.message}`);
     }

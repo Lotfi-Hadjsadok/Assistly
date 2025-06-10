@@ -52,7 +52,7 @@ I'm the AI Assistant.
 How can I help you today?"),
             "brand_color" => "#0092b8",
             "theme" => "light",
-            "orientation" => "left",
+            "orientation" => "right",
             "logo" => null,
             "behavior" => [
                 "instructions" => "",

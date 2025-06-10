@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\KnowledgeStatus;
 use App\Models\Embedding;
+use App\Models\User;
 use App\Services\TrainAIService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,7 +50,7 @@ class KnowledgeWebsite extends Model
         $this->status = KnowledgeStatus::TRAINING;
         $this->save();
         $trainAIService = app(TrainAIService::class);
-        $trainAIService->embedWebsite($this);
+        return $trainAIService->embedWebsite($this);
     }
 
     public function setTrained()
@@ -71,5 +72,10 @@ class KnowledgeWebsite extends Model
     public function embeddings()
     {
         return $this->morphMany(Embedding::class, 'source');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

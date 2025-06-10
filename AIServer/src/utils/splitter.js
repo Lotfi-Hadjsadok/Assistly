@@ -1,8 +1,11 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HtmlToTextTransformer } from "@langchain/community/document_transformers/html_to_text";
+import dotenv from "dotenv";
+dotenv.config();
+
 export const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 1000,
-  chunkOverlap: 100,
+  chunkSize: process.env.KNOWLEDGE_CHUNK_SIZE,
+  chunkOverlap: process.env.KNOWLEDGE_CHUNK_OVERLAP,
 });
 
 export const shouldSplit = (docs, ext = null) => {

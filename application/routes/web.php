@@ -32,4 +32,6 @@ Route::group(['middleware' => ['auth']], function () {
 
 Route::get('/login', Login\Index::class)->name('login');
 Route::get('/register', Register\Index::class)->name('register');
-Route::get('/embed/chatbot/{chatbot}', [EmbedChatbotController::class, 'show'])->name('chatbot.embed');
+Route::get('/embed/chatbot/{user:api_key}/{chatbot}', [EmbedChatbotController::class, 'show'])
+    ->name('chatbot.embed')
+    ->middleware('allowIframeEmbedding');

@@ -6,11 +6,13 @@ import fs from "fs/promises";
 import { embeddings } from "../utils/models.js";
 import { splitter, shouldSplit } from "../utils/splitter.js";
 import { sendResponse, sendError } from "../utils/sendResponse.js";
+import dotenv from "dotenv";
+dotenv.config();
 export const embedDocument = async (req, res) => {
   try {
     const file = req.file;
     let loader;
-
+    const { knowledgeCredits } = req.body;
     const ext = file.originalname.split(".").pop().toLowerCase();
     switch (ext) {
       case "pdf":
@@ -39,6 +41,20 @@ export const embedDocument = async (req, res) => {
     const chunks = shouldSplit(docs, ext)
       ? await splitter.splitDocuments(docs)
       : docs;
+    const leftCredit =
+      knowledgeCredits -
+      chunks.length * parseInt(process.env.KNOWLEDGE_CHUNK_SIZE);
+
+    if (leftCredit < 0) {
+      return sendError(
+        res,
+        `Not enough credits, you need ${
+          chunks.length * parseInt(process.env.KNOWLEDGE_CHUNK_SIZE) -
+          knowledgeCredits
+        } more credits`,
+        400
+      );
+    }
     const vectors = await Promise.all(
       chunks.map(async (chunk) => {
         const embedding = await embeddings.embedQuery(chunk.pageContent);
@@ -50,7 +66,16 @@ export const embedDocument = async (req, res) => {
         };
       })
     );
-    sendResponse(res, vectors, "Success", 200);
+
+    sendResponse(
+      res,
+      {
+        vectors,
+        leftCredit,
+      },
+      "Success",
+      200
+    );
   } catch (error) {
     await fs.unlink(file.path);
     sendError(res, error, 500);

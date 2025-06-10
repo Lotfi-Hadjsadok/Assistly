@@ -43,7 +43,11 @@ class WebsiteRow extends Component
         if (!$this->website->hasToTrain) {
         }
         $this->authorize('update', $this->website);
-        $this->form->trainWebsite($this->website);
-        $this->dispatch("refresh.{$this->website->id}")->self();
+        $response = $this->form->trainWebsite($this->website);
+        if (isset($response['error'])) {
+            Flux::toast($response['error'], 'Error', variant: 'danger');
+        } else {
+            $this->dispatch("refresh.{$this->website->id}")->self();
+        }
     }
 }

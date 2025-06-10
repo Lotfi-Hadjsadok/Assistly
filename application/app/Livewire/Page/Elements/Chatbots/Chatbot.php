@@ -8,6 +8,7 @@ use Livewire\Attributes\On;
 use App\Models\ChatbotMessage;
 use App\Livewire\Forms\ChatbotForm;
 use App\Models\Chatbot as ChatBotModel;
+use Illuminate\Support\Facades\Session;
 
 class Chatbot extends Component
 {
@@ -19,37 +20,38 @@ class Chatbot extends Component
     public $size = 'sm';
     public $message;
     public $loading = false;
-
+    public $session;
 
     #[On('refresh')]
     public function mount(ChatBotModel|ChatbotForm $chatbot)
     {
         $this->chatbot = $chatbot instanceof ChatbotForm ? $chatbot->chatbot : $chatbot;
+        $this->session = Session::get('session_id', uniqid());
+        Session::put('session_id', $this->session);
         $this->refreshMessages();
     }
 
     #[On('refreshMessages')]
     public function refreshMessages()
     {
-        $this->messages = $this->chatbot->messages()->get()->toArray();
+        $session = $this->chatbot->sessions()->where('session_id', $this->session)->first();
+        $this->messages = $session?->messages()->get()->toArray() ?? [];
         $this->messages = array_merge([
             [
                 'content' => $this->chatbot->settings['welcome_message'],
                 'role' => 'assistant',
-            ]
+            ],
         ], $this->messages);
     }
     public function sendMessage()
     {
         $session = $this->chatbot->sessions()->firstOrCreate([
-            'session_id' => 222,
+            'session_id' => $this->session,
         ]);
         $message = $session->messages()->create([
             'content' => $this->message,
             'role' => 'user',
         ]);
-
-
 
         $response = $this->generateResponse($message);
 

@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->integer('credits')->default(10);
+            $table->integer('knowledge_credits')->default(2500);
+            $table->text('api_key')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

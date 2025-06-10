@@ -28,8 +28,12 @@ class DocumentRow extends Component
         if ($this->document->status == KnowledgeStatus::TRAINING) {
             return;
         }
-        $this->document->train();
-        $this->document->refresh();
+        $response = $this->document->train();
+        if (isset($response['error'])) {
+            Flux::toast($response['error'], 'Error', variant: 'danger');
+        } else {
+            $this->document->refresh();
+        }
     }
 
     public function deleteDocument()

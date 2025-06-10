@@ -89,6 +89,6 @@ class WebsiteKnowledgeForm extends Form
 
     public function trainWebsite(KnowledgeWebsite $website)
     {
-        $website->train();
+        return $website->train();
     }
 }

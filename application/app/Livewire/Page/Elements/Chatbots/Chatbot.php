@@ -42,6 +42,8 @@ class Chatbot extends Component
                 'role' => 'assistant',
             ],
         ], $this->messages);
+        $this->dispatch('refreshed-messages');
+        return $this->messages;
     }
     public function sendMessage()
     {
@@ -53,20 +55,34 @@ class Chatbot extends Component
             'role' => 'user',
         ]);
 
-        $response = $this->generateResponse($message);
+
+        if ($this->chatbot->user->credits > 0) {
+            $response = $this->generateResponse($message);
+            $this->chatbot->user->decrement('credits', 1);
+        } else {
+            $response = 'Contact support.';
+        }
 
         $response = $session->messages()->create([
             'content' => $response,
             'role' => 'assistant'
         ]);
+
         return $response;
+    }
+
+    public function newChat()
+    {
+        $this->session = uniqid();
+        Session::put('session_id', $this->session);
+        $this->refreshMessages();
     }
 
 
     public function generateResponse(ChatbotMessage $message)
     {
         $ai = app(TrainAIService::class);
-        return $ai->ask($message->content);
+        return $ai->ask($message, 'en');
     }
 
     public function render()

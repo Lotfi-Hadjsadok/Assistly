@@ -6,6 +6,7 @@ use App\Enums\KnowledgeStatus;
 use App\Models\Embedding;
 use App\Models\KnowledgeWebsite;
 use App\Models\KnowledgeDocument;
+use App\Models\ChatbotMessage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -44,9 +45,15 @@ class TrainAIService
                 'knowledgeCredits' => $website->user->knowledge_credits,
             ]);
             if ($response->failed()) {
-                $website->update([
-                    'status' => 'failed',
-                ]);
+                if ($website->was_trained) {
+                    $website->update([
+                        'status' => KnowledgeStatus::TRAINED_PARTIALLY,
+                    ]);
+                } else {
+                    $website->update([
+                        'status' => 'failed',
+                    ]);
+                }
                 return [
                     'error' => $response->json('message'),
                 ];
@@ -112,20 +119,30 @@ class TrainAIService
         }
     }
 
-    public function ask($query, $language = 'en')
+    public function ask(ChatbotMessage $message, $language = 'en')
     {
         try {
-            $vectors = $this->getVectorsOfSimilarity($query);
+            $memory = $message->session->messages()->get()->toArray();
+            array_pop($memory);
+            $memory = array_map(function ($item) {
+                return [
+                    'role' => $item['role'],
+                    'content' => $item['content'],
+                ];
+            }, $memory);
+            $vectors = $this->getVectorsOfSimilarity($message->content);
             if (empty($vectors)) {
                 return false;
             }
             $response = Http::post(AI_SERVER_API . '/get/response', [
-                'query' => $query,
+                'query' => $message->content,
                 'vectors' => $vectors,
                 'language' => $language,
+                'memory' => $memory,
             ]);
             return $response->json('data');
         } catch (\Exception $e) {
+            dd($e->getMessage());
             Log::error('Error getting response: ' . $e->getMessage());
             return false;
         }

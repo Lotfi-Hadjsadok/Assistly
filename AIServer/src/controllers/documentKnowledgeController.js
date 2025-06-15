@@ -36,6 +36,7 @@ export const embedDocument = async (req, res) => {
     }
 
     const docs = await loader.load();
+    console.log(docs);
     await fs.unlink(file.path);
 
     const chunks = shouldSplit(docs, ext)

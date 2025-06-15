@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\User;
+use App\Models\ChatbotMessage;
 use App\Models\ChatbotSession;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\ChatbotMessage;
 
 class Chatbot extends Model
 {
@@ -30,5 +31,10 @@ class Chatbot extends Model
     public function messages()
     {
         return $this->hasManyThrough(ChatbotMessage::class, ChatbotSession::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

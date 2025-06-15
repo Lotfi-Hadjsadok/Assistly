@@ -5,6 +5,7 @@ namespace App\Livewire\Page\Knowledge;
 use Flux\Flux;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use App\Enums\KnowledgeStatus;
 use App\Models\KnowledgeWebsite;
 use Illuminate\Support\Facades\Auth;
 use App\Livewire\Forms\WebsiteKnowledgeForm;
@@ -59,6 +60,11 @@ class Websites extends Component
     {
         $this->authorize('update', $this->selectedWebsite);
         $this->form->addToSiteMap($this->selectedWebsite);
+        $this->selectedWebsite->update(
+            [
+                'status' => KnowledgeStatus::TRAINED_PARTIALLY,
+            ]
+        );
         $this->dispatch('refresh')->self();
         $this->dispatch('refresh.' . $this->selectedWebsite->id)->to(WebsiteRow::class);
     }

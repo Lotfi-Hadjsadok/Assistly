@@ -46,14 +46,14 @@
                     @if ($preview) wire:text='$parent.chatbotForm.settings.description' @endif>{{ $chatbot->settings['description'] }}</span>
             </flux:text>
             <div>
-                <flux:button icon="chat-bubble-bottom-center-text" variant="primary"
+                <flux:button wire:click="newChat" icon="chat-bubble-bottom-center-text" variant="primary"
                     class="rounded-lg bg-black/40 hover:bg-black/20 shadow-none! border-none!">
                     <flux:text class="text-white! {{ $buttonSize }}">New chat</flux:text>
                 </flux:button>
-                <flux:button icon="question-mark-circle" variant="primary"
+                {{-- <flux:button icon="question-mark-circle" variant="primary"
                     class="rounded-lg bg-black/40 hover:bg-black/20 shadow-none! border-none!">
                     <flux:text class="text-white! {{ $buttonSize }}">See FAQ</flux:text>
-                </flux:button>
+                </flux:button> --}}
             </div>
 
 

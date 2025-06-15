@@ -5,7 +5,11 @@ import {
   standalonePrompt,
   translatePrompt,
 } from "../utils/prompts.js";
-import { PromptTemplate } from "@langchain/core/prompts";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+  PromptTemplate,
+} from "@langchain/core/prompts";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { sendResponse, sendError } from "../utils/sendResponse.js";
@@ -22,11 +26,15 @@ export const getEmbedding = async (req, res) => {
 
 export const getResponse = async (req, res) => {
   try {
-    const { query, vectors, language } = req.body;
+    const { query, vectors, language, memory } = req.body;
 
     const context = vectors.map((v) => v).join("\n");
 
-    const promptTemplate = PromptTemplate.fromTemplate(mainPrompt);
+    const promptTemplate = ChatPromptTemplate.fromMessages([
+      ["system", mainPrompt],
+      new MessagesPlaceholder("memory"),
+      ["user", "{query}"],
+    ]);
 
     const standalonePromptTemplate =
       PromptTemplate.fromTemplate(standalonePrompt);
@@ -56,6 +64,7 @@ export const getResponse = async (req, res) => {
       {
         query: standaloneChain,
         context: (input) => input.context,
+        memory: (input) => input.memory,
         notFoundMessage: (input) => input.notFoundMessage,
         language: (input) => input.language,
       },
@@ -78,6 +87,7 @@ export const getResponse = async (req, res) => {
 
     const response = await chain.invoke({
       question: query,
+      memory,
       notFoundMessage: notFoundMessage,
       context,
       language,

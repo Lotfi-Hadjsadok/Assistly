@@ -29,8 +29,7 @@ class KnowledgeWebsite extends Model
 
     public function getHasToTrainAttribute()
     {
-        return $this->status !== KnowledgeStatus::TRAINED
-            || collect($this->sitemap)->some(fn($page) => !$page['trained']);
+        return $this->status != KnowledgeStatus::TRAINED;
     }
 
     public function setWasTrainedAttribute($value)
@@ -46,7 +45,7 @@ class KnowledgeWebsite extends Model
 
     public function train()
     {
-        $this->wasTrained = $this->status == KnowledgeStatus::TRAINED;
+        $this->wasTrained = $this->status == KnowledgeStatus::TRAINED || $this->status == KnowledgeStatus::TRAINED_PARTIALLY;
         $this->status = KnowledgeStatus::TRAINING;
         $this->save();
         $trainAIService = app(TrainAIService::class);

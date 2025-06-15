@@ -20,7 +20,7 @@ $iconSize = match ($size) {
     });
     loading = e.detail.role == 'user' ? true : false;
     $nextTick(() => { $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight; });
-});"
+});" @refreshed-messages.window="messages = $wire.messages"
     x-data='{
     messages: @json($messages),
     chatbot: @json($chatbot),

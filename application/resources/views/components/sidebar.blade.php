@@ -19,8 +19,7 @@
                 <flux:navlist.item icon="file-text" href="{{ route('knowledge.documents') }}">
                     {{ __('Documents') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="question-mark-circle" href="#">{{ __('FAQS') }}
-                </flux:navlist.item>
+
             </flux:navlist.group>
 
             <flux:navlist.group heading="{{ __('Elements') }}" class="mt-4">

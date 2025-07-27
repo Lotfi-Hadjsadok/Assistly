@@ -1,131 +1,73 @@
-@php
-    $size = match ($size) {
-        'xs' => 'xs',
-        'sm' => 'sm',
-        default => 'sm',
-    };
-    $iconSize = match ($size) {
-        'xs' => 'size-6',
-        'sm' => 'size-7',
-        default => 'size-6',
-    };
-    $headlineSize = match ($size) {
-        'xs' => 'text-lg',
-        'sm' => 'text-xl',
-        default => 'text-xl',
-    };
-    $descriptionSize = match ($size) {
-        'xs' => 'text-xs',
-        'sm' => 'text-sm',
-        default => 'text-sm',
-    };
-    $buttonSize = match ($size) {
-        'xs' => 'text-xs',
-        'sm' => 'text-sm',
-        default => 'text-sm',
-    };
-@endphp
-
-<div wire:ignore x-data="chatbot"
-    style="height: {{ $height }}; width: {{ $width }};min-width: {{ $width }};"
-    class="flex-col flex relative justify-end">
-    <div x-cloak x-transition x-show="showChat"
-        class="relative flex flex-col  justify-between overflow-hidden h-full bg-white! p-0! border-none rounded-3xl!">
-        <div @if ($preview) :style="{
-            background: 'linear-gradient(to right, ' + normalizeHex($wire.$parent.chatbotForm.settings.brand_color) + ', ' +
-                normalizeHex($wire.$parent.chatbotForm.settings.brand_color) + 'B3)'
-        }" @endif
-            style="background: linear-gradient(to right, {{ normalizeHex($chatbot->settings['brand_color']) }}, {{ normalizeHex($chatbot->settings['brand_color']) }}B3)"
-            class="space-y-4 p-8 text-center">
-            <flux:heading class="text-white">
-                <span class="{{ $headlineSize }}"
-                    @if ($preview) wire:text='$parent.chatbotForm.settings.headline' @endif>{{ $chatbot->settings['headline'] }}</span>
-            </flux:heading>
-            <flux:text class="text-white">
-                <span class="{{ $descriptionSize }}"
-                    @if ($preview) wire:text='$parent.chatbotForm.settings.description' @endif>{{ $chatbot->settings['description'] }}</span>
-            </flux:text>
-            <div>
-                <flux:button wire:click="newChat" icon="chat-bubble-bottom-center-text" variant="primary"
-                    class="rounded-lg bg-black/40 hover:bg-black/20 shadow-none! border-none!">
-                    <flux:text class="text-white! {{ $buttonSize }}">New chat</flux:text>
-                </flux:button>
-                {{-- <flux:button icon="question-mark-circle" variant="primary"
-                    class="rounded-lg bg-black/40 hover:bg-black/20 shadow-none! border-none!">
-                    <flux:text class="text-white! {{ $buttonSize }}">See FAQ</flux:text>
-                </flux:button> --}}
-            </div>
-
-
-        </div>
-        <div x-ref="messagesContainer" class="overflow-auto flex-1">
-            <x-chatbots.chatbot.messages :$size :$messages :$chatbot :$preview />
-        </div>
-
-        <form @submit.prevent="sendMessage"
-            class="p-2 bottom-0 flex flex-col justify-between left-0  bg-gray-100 right-0">
-            <flux:card class="bg-white! p-0! ring-1! ring-gray-300/50! flex  items-center justify-between w-full">
-                <flux:input autocomplete="off" x-model="message" wire:model="message" class:input="text-black!"
-                    class="p-1" size="{{ $size }}" placeholder="Type your message here..." />
-                <flux:button type="submit" icon="paper-airplane" size="{{ $size }}" class="text-black!"
-                    variant="ghost" />
-            </flux:card>
-            <div class="flex gap-1 items-center  justify-center mt-2">
-                <flux:text class="text-gray-500 text-[10px]">
-                    Powered by
-                </flux:text>
-                <flux:text class="text-accent font-bold text-[11px]">
-                    Assitly
-                </flux:text>
-            </div>
-            <div>
-            </div>
-        </form>
+<div x-cloak x-data="chatbot" class="min-w-100 rounded-2xl flex justify-between flex-col shadow-2xl overflow-hidden">
+    <!-- Header -->
+    <div :style="{ backgroundImage: `linear-gradient(to left, ${$wire.$parent.chatbotForm.settings.brand_color}, ${transaparentColor($wire.$parent.chatbotForm.settings.brand_color, '80')})` }"
+        class="flex py-10 flex-col gap-2 items-center justify-between">
+        <h3 class="font-semibold text-2xl text-white" x-text="$wire.$parent.chatbotForm.settings.headline"></h3>
+        <p class="text-sm text-gray-200" x-text="$wire.$parent.chatbotForm.settings.description"></p>
     </div>
 
-    <div @class([
-        'flex',
-        'justify-end' => $chatbot->settings['orientation'] == 'right',
-        'justify-start' => $chatbot->settings['orientation'] == 'left',
-    ])
-        @if ($preview) :class="$wire.$parent.chatbotForm.settings.orientation == 'right' ? 'justify-end!' : 'justify-start!'" @endif>
-        <button
-            @click="showChat = !showChat;
-        await $nextTick();
-        $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight
-        "
-            @if ($preview) :style="{
-                background: $wire.$parent.chatbotForm.settings.brand_color
-            }" @endif
-            style="background: {{ $chatbot->settings['brand_color'] }}"
-            class="w-fit p-4 mt-4 rounded-full flex items-center justify-center">
-            <x-chatbots.chatbot.bot-icon x-cloak x-show="!showChat" class="text-white {{ $iconSize }}!" />
-            <flux:icon x-cloak x-show="showChat" name="x-mark" class="text-white {{ $iconSize }}!"></flux:icon>
-        </button>
+    <!-- Chat Messages -->
+    <div class="p-4 space-y-4 flex-1  overflow-y-auto bg-gray-50">
+        <!-- Welcome Message -->
+        <div class="flex items-start space-x-3">
+            <div :style="{ backgroundColor: $wire.$parent.chatbotForm.settings.brand_color }"
+                class="w-8 h-8 border border-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+                </svg>
+            </div>
+            <div class="bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-sm max-w-xs">
+                <span x-text="$wire.$parent.chatbotForm.settings.welcome_message"
+                    class="text-sm whitespace-pre-wrap break-words text-gray-800 "></span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3 pt-2">
+            @for ($i = 0; $i < 3; $i++) <button :style="{ backgroundColor: transaparentColor($wire.$parent.chatbotForm.settings.brand_color, '20'), borderColor: $wire.$parent.chatbotForm.settings.brand_color, color: $wire.$parent.chatbotForm.settings.brand_color,
+            }" class="w-full  border-[1.5px] rounded-full px-4 py-3 text-sm font-medium transition-colors text-center">
+                🔧 Build AI chatbot
+                </button>
+                @endfor
+
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="border-t border-gray-100 p-4 bg-white">
+        <div class="flex items-center space-x-2">
+            <input :style="{ borderColor: $wire.$parent.chatbotForm.settings.brand_color,
+            '--tw-ring-color': $wire.$parent.chatbotForm.settings.brand_color
+            }" type="text" placeholder="Type your message here"
+                class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2  focus:border-transparent" />
+            <button :style="{ backgroundColor: $wire.$parent.chatbotForm.settings.brand_color,
+                '--tw-ring-color': $wire.$parent.chatbotForm.settings.brand_color
+                }"
+                class="w-10 h-10  hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
+        </div>
+        <p class="text-xs text-gray-500 text-center mt-2">Powered by <span
+                :style="{ color: $wire.$parent.chatbotForm.settings.brand_color }" class="font-medium">ChatBot</span>
+        </p>
     </div>
 </div>
 
-
+@script
 <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('chatbot', () => {
-            return {
-                message: '',
-                loading: @json($loading),
-                showChat: @json($preview),
-                async sendMessage() {
-                    if (this.loading) return;
-                    this.$dispatch('sendMessage', {
-                        content: this.message,
-                        role: 'user'
-                    });
-                    this.loading = true;
-                    this.message = '';
-                    const response = await this.$wire.sendMessage();
-                    this.$dispatch('sendMessage', response)
-                    this.loading = false;
-                }
-            }
-        });
-    });
+    Alpine.data('chatbot', () => ({
+        messages: [],
+        transaparentColor(color, code) {
+            return `${color}${code}`;
+        },
+        loading: false,
+        sendMessage(message) {
+            this.messages.push(message);
+        }
+    }));
 </script>
+@endscript

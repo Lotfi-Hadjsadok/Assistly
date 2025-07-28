@@ -35,7 +35,12 @@ class Chatbot extends Component
     public function refreshMessages()
     {
         $session = $this->chatbot->sessions()->where('session_id', $this->session)->first();
-        $this->messages = $session?->messages()->get()->toArray() ?? [];
+        $this->messages = $session?->messages()->get()->toArray() ?? [
+            [
+                'content' => 'Hello, am lotfi!',
+                'role' => 'user',
+            ]
+        ];
         $this->messages = array_merge([
             [
                 'content' => $this->chatbot->settings['welcome_message'],
@@ -47,28 +52,34 @@ class Chatbot extends Component
     }
     public function sendMessage()
     {
-        $session = $this->chatbot->sessions()->firstOrCreate([
-            'session_id' => $this->session,
-        ]);
-        $message = $session->messages()->create([
+        // $session = $this->chatbot->sessions()->firstOrCreate([
+        //     'session_id' => $this->session,
+        // ]);
+        // $message = $session->messages()->create([
+        //     'content' => $this->message,
+        //     'role' => 'user',
+        // ]);
+
+
+        // if ($this->chatbot->user->credits > 0) {
+        //     $response = $this->generateResponse($message);
+        //     $this->chatbot->user->decrement('credits', 1);
+        // } else {
+        //     $response = 'Contact support.';
+        // }
+
+        // $response = $session->messages()->create([
+        //     'content' => $response,
+        //     'role' => 'assistant'
+        // ]);
+
+        // return $response;
+        $this->messages[] = [
             'content' => $this->message,
-            'role' => 'user',
-        ]);
-
-
-        if ($this->chatbot->user->credits > 0) {
-            $response = $this->generateResponse($message);
-            $this->chatbot->user->decrement('credits', 1);
-        } else {
-            $response = 'Contact support.';
-        }
-
-        $response = $session->messages()->create([
-            'content' => $response,
-            'role' => 'assistant'
-        ]);
-
-        return $response;
+            'role' => 'user'
+        ];
+        $this->message = "";
+        sleep(2);
     }
 
     public function newChat()

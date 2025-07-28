@@ -8,6 +8,7 @@ use Livewire\Attributes\On;
 use App\Models\ChatbotMessage;
 use App\Livewire\Forms\ChatbotForm;
 use App\Models\Chatbot as ChatBotModel;
+use App\Models\ChatbotSession;
 use Illuminate\Support\Facades\Session;
 
 class Chatbot extends Component
@@ -35,12 +36,7 @@ class Chatbot extends Component
     public function refreshMessages()
     {
         $session = $this->chatbot->sessions()->where('session_id', $this->session)->first();
-        $this->messages = $session?->messages()->get()->toArray() ?? [
-            [
-                'content' => 'Hello, am lotfi!',
-                'role' => 'user',
-            ]
-        ];
+        $this->messages = $session?->messages()->get()->toArray() ?? [];
         $this->messages = array_merge([
             [
                 'content' => $this->chatbot->settings['welcome_message'],
@@ -52,34 +48,40 @@ class Chatbot extends Component
     }
     public function sendMessage()
     {
-        // $session = $this->chatbot->sessions()->firstOrCreate([
-        //     'session_id' => $this->session,
-        // ]);
-        // $message = $session->messages()->create([
-        //     'content' => $this->message,
-        //     'role' => 'user',
-        // ]);
-
-
-        // if ($this->chatbot->user->credits > 0) {
-        //     $response = $this->generateResponse($message);
-        //     $this->chatbot->user->decrement('credits', 1);
-        // } else {
-        //     $response = 'Contact support.';
-        // }
-
-        // $response = $session->messages()->create([
-        //     'content' => $response,
-        //     'role' => 'assistant'
-        // ]);
-
-        // return $response;
-        $this->messages[] = [
+        $session = $this->chatbot->sessions()->firstOrCreate([
+            'session_id' => $this->session,
+        ]);
+        $messageContent = [
             'content' => $this->message,
-            'role' => 'user'
+            'role' => 'user',
         ];
-        $this->message = "";
-        sleep(2);
+        $message = $session->messages()->create($messageContent);
+        $this->messages = array_merge($this->messages, [$messageContent]);
+        $this->loading = true;
+        $this->dispatch('generate-response', message: $message, session: $session->id);
+        $this->dispatch('message-sent');
+    }
+
+    #[On('generate-response')]
+    public function generateResponse($message, ChatbotSession $session)
+    {
+        $ai = app(TrainAIService::class);
+
+        if ($this->chatbot->user->credits > 0) {
+            $response = 'Answer';
+            $this->chatbot->user->decrement('credits', 1);
+        } else {
+            $response = 'Contact support.';
+        }
+
+        $messageContent = [
+            'content' => $response,
+            'role' => 'assistant'
+        ];
+        $response = $session->messages()->create($messageContent);
+        $this->messages = array_merge($this->messages, [$messageContent]);
+        $this->loading = false;
+        $this->dispatch('message-sent');
     }
 
     public function newChat()
@@ -89,12 +91,6 @@ class Chatbot extends Component
         $this->refreshMessages();
     }
 
-
-    public function generateResponse(ChatbotMessage $message)
-    {
-        $ai = app(TrainAIService::class);
-        return $ai->ask($message, 'en');
-    }
 
     public function render()
     {

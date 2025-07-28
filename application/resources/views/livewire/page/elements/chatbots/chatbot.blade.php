@@ -7,7 +7,7 @@
     </div>
 
     <!-- Chat Messages -->
-    <div class="p-4 space-y-4 flex-1  overflow-y-auto bg-gray-50">
+    <div x-ref="messageContainer" class="p-4 space-y-4 flex-1  overflow-y-auto bg-gray-50">
         <!-- Welcome Message -->
         @foreach ($messages as $index=>$message)
         <div class="flex items-start {{ $message['role'] == 'user' ? 'flex-row-reverse':'' }} gap-3">
@@ -38,7 +38,24 @@
                 </span>
             </div>
         </div>
-
+        @if ($loading)
+        <div class="flex items-start gap-3">
+            <div :style="{ backgroundColor: $wire.$parent.chatbotForm.settings.brand_color }"
+                class="w-8 h-8 border border-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+                </svg>
+            </div>
+            <div class="bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-sm max-w-xs">
+                <div class="flex items-center space-x-1">
+                    <div class="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+            </div>
+        </div>
+        @endif
         <!-- Action Buttons -->
         @if (count($message) < 1) <div class="space-y-3 pt-2">
             @for ($i = 0; $i < 3; $i++) <button :style="{ backgroundColor: transaparentColor($wire.$parent.chatbotForm.settings.brand_color, '20'), borderColor: $wire.$parent.chatbotForm.settings.brand_color, color: $wire.$parent.chatbotForm.settings.brand_color,
@@ -73,6 +90,16 @@
         Alpine.data('chatbot', () => ({
         messages: [],
         message:'',
+        init(){
+            this.$wire.on('message-sent', () => {
+            this.$nextTick(() => {
+                this.$refs.messageContainer.scrollTo({
+                    top: this.$refs.messageContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
+            });
+        },
         transaparentColor(color, code) {
             return `${color}${code}`;
         },

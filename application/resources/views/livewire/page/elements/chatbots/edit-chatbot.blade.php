@@ -24,12 +24,14 @@
 
             <x-chatbots.wizard.connectionTab :chatbot="$chatbot" />
 
-            {{-- <!-- Behavior Tab -->
+            {{--
+            <!-- Behavior Tab -->
             <flux:tab.panel name="behavior">
                 <flux:text>Behavior</flux:text>
             </flux:tab.panel>
 
-            {{-- <!-- Connections Tab --> --}}
+            {{--
+            <!-- Connections Tab --> --}}
             <flux:tab.panel name="connections">
                 <flux:heading class="text-xl">
                     Embed your chatbot
@@ -40,8 +42,8 @@
                         chatbot:
                     </flux:text>
                     <div language="html" class="rounded-lg! bg-gray-100! p-4! text-base!">
-                        &lt;iframe src="https://your-domain.com/chatbot/{{ $chatbot->id }}" width="400"
-                        height="600" style="border:none;"&gt;&lt;/iframe&gt;
+                        <iframe src="{{ url('chatbot/' . $chatbot->id) }}" width="400" height="600"
+                            style="border:none;"></iframe>
                     </div>
                     <flux:text class="text-xs text-gray-500!">
                         You can adjust the <code>width</code> and <code>height</code> as needed for your site.
@@ -49,12 +51,14 @@
                 </div>
             </flux:tab.panel>
 
-            {{-- <!-- Settings Tab -->
+            {{--
+            <!-- Settings Tab -->
             <flux:tab.panel name="settings">
                 <flux:text>Settings</flux:text>
             </flux:tab.panel> --}}
 
-            {{-- <!-- Install Tab -->
+            {{--
+            <!-- Install Tab -->
             <flux:tab.panel name="install">
                 <flux:text>Install</flux:text>
             </flux:tab.panel> --}}
@@ -66,6 +70,9 @@
 
 
     <!-- Begin Chatbot Preview -->
-    <livewire:page.elements.chatbots.chatbot :chatbot="$chatbotForm" :preview="true" />
+    <div class="flex justify-end min-w-[450px]  !max-h-full">
+        <livewire:page.elements.chatbots.chatbot height="90%" width="450px" :chatbot="$chatbotForm" :preview="true" />
+    </div>
+
     <!-- End Chatbot Preview -->
 </div>

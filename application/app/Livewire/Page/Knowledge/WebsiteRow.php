@@ -48,6 +48,7 @@ class WebsiteRow extends Component
             Flux::toast($response['error'], 'Error', variant: 'danger');
         } else {
             $this->dispatch("refresh.{$this->website->id}")->self();
+            $this->dispatch('creditsUpdated');
         }
     }
 }

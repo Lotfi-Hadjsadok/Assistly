@@ -17,7 +17,7 @@ class Chatbot extends Component
     public ChatBotModel|ChatbotForm $chatbot;
     public $preview;
     public $height = '100%';
-    public $width = '450px';
+    public $width = '750px';
     public $size = 'sm';
     public $message;
     public $loading = false;
@@ -48,6 +48,10 @@ class Chatbot extends Component
     }
     public function sendMessage()
     {
+        if ($this->message == '') {
+            return;
+        }
+        $this->message = trim($this->message);
         $session = $this->chatbot->sessions()->firstOrCreate([
             'session_id' => $this->session,
         ]);
@@ -55,6 +59,7 @@ class Chatbot extends Component
             'content' => $this->message,
             'role' => 'user',
         ];
+        $this->message = '';
         $message = $session->messages()->create($messageContent);
         $this->messages = array_merge($this->messages, [$messageContent]);
         $this->loading = true;
@@ -82,6 +87,7 @@ class Chatbot extends Component
         $this->messages = array_merge($this->messages, [$messageContent]);
         $this->loading = false;
         $this->dispatch('message-sent');
+        $this->dispatch('creditsUpdated');
     }
 
     public function newChat()

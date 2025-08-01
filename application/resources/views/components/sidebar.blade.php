@@ -2,9 +2,13 @@
     <flux:sidebar sticky stashable {{ $attributes }}>
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-        <flux:brand href="{{ route('dashboard') }}" logo="/img/demo/logo.png" name="Assistly" class="px-2 dark:hidden" />
+        <flux:brand href="{{ route('dashboard') }}" logo="/img/demo/logo.png" name="Assistly"
+            class="px-2 dark:hidden" />
         <flux:brand href="{{ route('dashboard') }}" logo="/img/demo/dark-mode-logo.png" name="Assistly"
             class="px-2 hidden dark:flex" />
+
+        <!-- Knowledge Credits Display -->
+        <livewire:components.user-credits />
 
         <flux:input variant="filled" placeholder="{{ __('Search...') }}" icon="magnifying-glass" />
         <flux:navlist variant="outline">

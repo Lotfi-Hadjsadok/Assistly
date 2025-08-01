@@ -36,23 +36,27 @@ export const embedDocument = async (req, res) => {
     }
 
     const docs = await loader.load();
-    console.log(docs);
     await fs.unlink(file.path);
 
     const chunks = shouldSplit(docs, ext)
       ? await splitter.splitDocuments(docs)
       : docs;
-    const leftCredit =
-      knowledgeCredits -
-      chunks.length * parseInt(process.env.KNOWLEDGE_CHUNK_SIZE);
+
+    // Calculate total characters across all chunks for precise credit calculation
+    const totalCharacters = chunks.reduce((total, chunk) => {
+      return total + (chunk.pageContent ? chunk.pageContent.length : 0);
+    }, 0);
+
+    console.log(totalCharacters);
+
+    const leftCredit = knowledgeCredits - totalCharacters;
 
     if (leftCredit < 0) {
       return sendError(
         res,
         `Not enough credits, you need ${
-          chunks.length * parseInt(process.env.KNOWLEDGE_CHUNK_SIZE) -
-          knowledgeCredits
-        } more credits`,
+          totalCharacters - knowledgeCredits
+        } more credits (${totalCharacters} characters found)`,
         400
       );
     }

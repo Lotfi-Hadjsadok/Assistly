@@ -33,6 +33,7 @@ class DocumentRow extends Component
             Flux::toast($response['error'], 'Error', variant: 'danger');
         } else {
             $this->document->refresh();
+            $this->dispatch('creditsUpdated');
         }
     }
 

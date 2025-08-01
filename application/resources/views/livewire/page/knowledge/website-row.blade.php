@@ -23,25 +23,24 @@
         <flux:heading class="sm:hidden">{{ __('TRAINED AT') }}</flux:heading>
         <flux:text class="text-sm text-nowrap">{{ $website->trained_at?->diffForHumans() ?? '-' }}</flux:text>
     </div>
-    <div class="col-span-1 flex justify-end">
+    <div wire:replace class="col-span-1 flex justify-end">
         <flux:dropdown>
             <flux:button variant="ghost" icon="ellipsis-vertical" />
 
             <flux:menu>
                 @if ($website->hasToTrain)
-                    <flux:menu.item wire:loading.remove wire:target='trainWebsite' wire:click="trainWebsite"
-                        class="hover:bg-success/20! hover:text-success!" icon="brain">
-                        Train
-                    </flux:menu.item>
-                    <flux:menu.separator wire:loading.remove wire:target='trainWebsite' />
+                <flux:menu.item wire:loading.remove wire:target='trainWebsite' wire:click="trainWebsite"
+                    class="hover:bg-success/20! hover:text-success!" icon="brain">
+                    Train
+                </flux:menu.item>
+                <flux:menu.separator wire:loading.remove wire:target='trainWebsite' />
                 @endif
                 <flux:menu.item wire:confirm="Are you sure you want to delete this website?" wire:click="deleteWebsite"
                     icon="trash" variant="danger">
                     {{ __('Delete') }}
                 </flux:menu.item>
                 <flux:menu.separator />
-                <flux:menu.item wire:click="openSettings" icon="cog"
-                    class="hover:bg-primary/20! hover:text-primary!">
+                <flux:menu.item wire:click="openSettings" icon="cog" class="hover:bg-primary/20! hover:text-primary!">
                     {{ __('Settings') }}
                 </flux:menu.item>
             </flux:menu>

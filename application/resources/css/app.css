@@ -5,7 +5,7 @@
 
 
 @theme {
-    --font-sans: Inter, sans-serif;
+    --font-sans: 'Inter', sans-serif;
 }
 
 /* Re-assign Flux's gray of choice... */
@@ -31,19 +31,19 @@
     --color-surface-dark: var(--color-slate-200);
     --color-danger: var(--color-red-500);
     --color-success: var(--color-green-500);
-    --color-warning: var(--color-yellow-500);
+    --color-warning: var(--color-orange-500);
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-blue-600);
+        --color-accent: var(--color-blue-500);
         --color-accent-content: var(--color-blue-400);
         --color-accent-foreground: var(--color-white);
         --color-surface: var(--color-slate-900);
         --color-surface-dark: var(--color-slate-950);
         --color-danger: var(--color-red-500);
         --color-success: var(--color-green-600);
-        --color-warning: var(--color-yellow-600);
+        --color-warning: var(--color-orange-500);
     }
 }
 

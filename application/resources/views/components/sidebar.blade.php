@@ -10,27 +10,32 @@
         <!-- Knowledge Credits Display -->
         <livewire:components.user-credits />
 
-        <flux:input variant="filled" placeholder="{{ __('Search...') }}" icon="magnifying-glass" />
         <flux:navlist variant="outline">
-            <flux:navlist.item icon="layout-dashboard" href="{{ route('dashboard') }}">
+            <flux:navlist.item icon="layout-dashboard" :current="request()->routeIs('dashboard')"
+                href="{{ route('dashboard') }}">
                 {{ __('Dashboard') }}
             </flux:navlist.item>
 
             <flux:navlist.group heading="{{ __('Knowledge Base') }}" class="mt-4">
-                <flux:navlist.item icon="globe" href="{{ route('knowledge.websites') }}">
+                <flux:navlist.item icon="globe" :current="request()->routeIs('knowledge.websites')"
+                    href="{{ route('knowledge.websites') }}">
                     {{ __('Websites') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="file-text" href="{{ route('knowledge.documents') }}">
+                <flux:navlist.item icon="file-text" :current="request()->routeIs('knowledge.documents')"
+                    href="{{ route('knowledge.documents') }}">
                     {{ __('Documents') }}
                 </flux:navlist.item>
 
             </flux:navlist.group>
 
             <flux:navlist.group heading="{{ __('Elements') }}" class="mt-4">
-                <flux:navlist.item icon="chat-bubble-bottom-center-text" href="{{ route('elements.chatbots') }}">
+                <flux:navlist.item icon="chat-bubble-bottom-center-text"
+                    :current="request()->routeIs('elements.chatbots')" href="{{ route('elements.chatbots') }}">
                     {{ __('Chatbots') }}</flux:navlist.item>
 
-                <flux:navlist.item icon="chat-bubble-bottom-center-text" href="{{ route('elements.chatbots.test') }}">
+                <flux:navlist.item icon="chat-bubble-bottom-center-text"
+                    :current="request()->routeIs('elements.chatbots.test')"
+                    href="{{ route('elements.chatbots.test') }}">
                     {{ __('Chat Test') }}</flux:navlist.item>
 
             </flux:navlist.group>

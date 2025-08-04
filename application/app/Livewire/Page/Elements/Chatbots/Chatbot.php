@@ -63,17 +63,17 @@ class Chatbot extends Component
         $message = $session->messages()->create($messageContent);
         $this->messages = array_merge($this->messages, [$messageContent]);
         $this->loading = true;
-        $this->dispatch('generate-response', message: $message, session: $session->id);
+        $this->dispatch('generate-response', message_id: $message->id, session: $session->id);
         $this->dispatch('message-sent');
     }
 
     #[On('generate-response')]
-    public function generateResponse($message, ChatbotSession $session)
+    public function generateResponse($message_id, ChatbotSession $session)
     {
         $ai = app(TrainAIService::class);
-
+        $message = ChatbotMessage::find($message_id);
         if ($this->chatbot->user->credits > 0) {
-            $response = 'Answer';
+            $response = $ai->ask($message, $this->chatbot);
             $this->chatbot->user->decrement('credits', 1);
         } else {
             $response = 'Contact support.';

@@ -7,6 +7,7 @@ use App\Models\Embedding;
 use App\Models\KnowledgeWebsite;
 use App\Models\KnowledgeDocument;
 use App\Models\ChatbotMessage;
+use App\Models\Chatbot;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -106,11 +107,9 @@ class TrainAIService
     {
         try {
             $vector = $this->getEmbedding($query);
-
             if (empty($vector)) {
                 return [];
             }
-
             $vectors = Embedding::getVectorsOfSimilarity($vector)->pluck('content')->toArray();
             return $vectors;
         } catch (\Exception $e) {
@@ -119,7 +118,7 @@ class TrainAIService
         }
     }
 
-    public function ask(ChatbotMessage $message, $language = 'en')
+    public function ask(ChatbotMessage $message, Chatbot $chatbot, $language = 'en')
     {
         try {
             $memory = $message->session->messages()->get()->toArray();
@@ -139,6 +138,7 @@ class TrainAIService
                 'vectors' => $vectors,
                 'language' => $language,
                 'memory' => $memory,
+                'chatbot' => $chatbot,
             ]);
             return $response->json('data');
         } catch (\Exception $e) {
@@ -157,8 +157,8 @@ class TrainAIService
                 $file,
                 $document->file_name
             )->post(AI_SERVER_API . '/embed/document', [
-                'knowledgeCredits' => $document->user->knowledge_credits,
-            ]);
+                        'knowledgeCredits' => $document->user->knowledge_credits,
+                    ]);
 
             if ($response->failed()) {
                 $document->update([

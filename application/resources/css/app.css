@@ -63,3 +63,9 @@ input{
     scrollbar-color: var(--color-zinc-600) var(--color-zinc-100);
     scrollbar-width:thin;
 }
+
+
+.message-content li{
+    list-style: disc;
+    margin:0.5rem 0 0.5rem 1rem;
+}

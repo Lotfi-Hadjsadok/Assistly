@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Embedding extends Model
 {
@@ -39,7 +40,15 @@ class Embedding extends Model
     public static function getVectorsOfSimilarity($embedding)
     {
         $embedding = json_encode($embedding);
-        $vectors = self::orderByRaw('embedding <=> ?', [$embedding])->limit(6)->get();
+        $sub = Embedding::selectRaw('*, embedding <=> ? as distance', [$embedding]);
+
+        $vectors = DB::table(DB::raw("({$sub->toSql()}) as sub"))
+            ->mergeBindings($sub->getQuery()) // required to keep bindings
+            ->where('distance', '<', 0.88)
+            ->orderBy('distance')
+            ->limit(10)
+            ->get();
+
         return $vectors;
     }
 

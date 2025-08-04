@@ -7,3 +7,11 @@ function normalizeHex($hex)
         ? '#' . $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2]
         : '#' . $hex;
 }
+
+
+function parseMarkdown($text)
+{
+    $parsedown = new Parsedown();
+    return $parsedown
+        ->text($text);
+}

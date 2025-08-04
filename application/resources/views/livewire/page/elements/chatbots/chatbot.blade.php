@@ -50,11 +50,11 @@
                     @if($preview) :style="{ backgroundColor: $wire.$parent.chatbotForm.settings.brand_color }" @endif
                     @endif
                     class="bg-white rounded-2xl {{ $message['role'] == 'user' ? 'rounded-tr-md' : 'rounded-tl-md' }} px-4 py-3 shadow-sm max-w-xs">
-                    <span @if($index < 1) @if($preview) x-html="$wire.$parent.chatbotForm.settings.welcome_message"
-                        @endif @endif class="
-                    text-sm whitespace-pre-wrap break-words 
+                    <span @if($index < 1 && $preview) x-html="$wire.$parent.chatbotForm.settings.welcome_message" @endif
+                        class="text-sm message-content {{ $index == 0 ? 'whitespace-pre-line' : '' }}  break-words 
                     {{ $message['role'] == 'user' ? 'text-white' : 'text-gray-800' }}">@if ($index > 0){!!
-                        trim($message['content']) !!}@elseif($index==0) {{ $chatbot['settings']['welcome_message']
+                        trim(parseMarkdown($message['content'])) !!}@elseif($index==0) {{
+                        $chatbot['settings']['welcome_message']
                         }}@endif</span>
                 </div>
             </div>

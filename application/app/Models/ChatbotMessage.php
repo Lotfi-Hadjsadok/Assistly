@@ -15,4 +15,9 @@ class ChatbotMessage extends Model
     {
         return $this->belongsTo(ChatbotSession::class, 'chatbot_session_id');
     }
+
+    public function getContentAttribute($value)
+    {
+        return parseMarkdown($value);
+    }
 }

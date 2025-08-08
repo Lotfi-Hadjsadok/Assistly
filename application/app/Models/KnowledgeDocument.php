@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\Embedding;
+use App\Models\Chatbot;
 use App\Enums\KnowledgeStatus;
 use App\Services\TrainAIService;
 use Illuminate\Database\Eloquent\Model;
@@ -44,5 +45,11 @@ class KnowledgeDocument extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function chatbots()
+    {
+        return $this->morphedByMany(Chatbot::class, 'knowledgeable', 'chatbot_knowledge')
+            ->withTimestamps();
     }
 }

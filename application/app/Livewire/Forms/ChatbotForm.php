@@ -4,8 +4,11 @@ namespace App\Livewire\Forms;
 
 use Livewire\Form;
 use App\Models\Chatbot;
+use App\Models\KnowledgeDocument;
+use App\Models\KnowledgeWebsite;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Flux\Flux;
 
 class ChatbotForm extends Form
 {
@@ -40,10 +43,11 @@ class ChatbotForm extends Form
 
     public function init(?Chatbot $chatbot = null)
     {
+
         $user = Auth::user();
         $this->chatbot = $chatbot;
-        $this->name =  $chatbot->name ?? __("Untitled");
-        $this->settings =  $chatbot->settings ?? [
+        $this->name = $chatbot->name ?? __("Untitled");
+        $this->settings = $chatbot->settings ?? [
             "headline" => __("Chat with our AI"),
             "description" => __("Ask any question and our AI will answer!"),
             "welcome_message" => __("Hi there 👋 
@@ -95,5 +99,83 @@ How can I help you today?"
         ]);
 
         return $bot;
+    }
+
+    public function linkDocument($documentId)
+    {
+        $document = Auth::user()->documents()->findOrFail($documentId);
+
+        // Check if already linked
+        $existingLink = $this->chatbot->knowledgeDocuments()->where('knowledgeable_id', $documentId)->first();
+        if (!$existingLink) {
+            $this->chatbot->knowledgeDocuments()->attach($document);
+            $this->chatbot = $this->chatbot->fresh('knowledgeDocuments');
+            Flux::toast(
+                text: 'Document linked successfully',
+                variant: 'success',
+                heading: 'Document linked',
+                position: 'bottom center',
+            );
+        }
+    }
+
+    public function unlinkDocument($documentId)
+    {
+        $this->chatbot->knowledgeDocuments()->detach($documentId);
+
+        Flux::toast(
+            text: 'Document unlinked successfully',
+            variant: 'success',
+            heading: 'Document unlinked',
+            position: 'bottom center',
+        );
+    }
+
+    public function linkWebsite($websiteId)
+    {
+        $website = Auth::user()->websites()->findOrFail($websiteId);
+
+        // Check if already linked
+        $existingLink = $this->chatbot->knowledgeWebsites()->where('knowledgeable_id', $websiteId)->first();
+        if (!$existingLink) {
+            $this->chatbot->knowledgeWebsites()->attach($websiteId);
+
+            Flux::toast(
+                text: 'Website linked successfully',
+                variant: 'success',
+                heading: 'Website linked',
+                position: 'bottom center',
+            );
+        }
+    }
+
+    public function unlinkWebsite($websiteId)
+    {
+        $this->chatbot->knowledgeWebsites()->detach($websiteId);
+
+        Flux::toast(
+            text: 'Website unlinked successfully',
+            variant: 'success',
+            heading: 'Website unlinked',
+            position: 'bottom center',
+        );
+    }
+
+    public function getAvailableDocuments()
+    {
+        $linkedDocumentIds = $this->chatbot->knowledgeDocuments()->pluck('knowledgeable_id');
+
+        return Auth::user()->documents()
+            ->whereNotIn('id', $linkedDocumentIds)
+            ->get();
+    }
+
+    public function getAvailableWebsites()
+    {
+        $linkedWebsiteIds = $this->chatbot->knowledgeWebsites()->pluck('knowledgeable_id');
+
+        return Auth::user()->websites()
+            ->whereNotIn('id', $linkedWebsiteIds)
+            ->get();
     }
 }

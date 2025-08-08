@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\KnowledgeStatus;
 use App\Models\Embedding;
 use App\Models\User;
+use App\Models\Chatbot;
 use App\Services\TrainAIService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -76,5 +77,11 @@ class KnowledgeWebsite extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function chatbots()
+    {
+        return $this->morphedByMany(Chatbot::class, 'knowledgeable', 'chatbot_knowledge')
+            ->withTimestamps();
     }
 }

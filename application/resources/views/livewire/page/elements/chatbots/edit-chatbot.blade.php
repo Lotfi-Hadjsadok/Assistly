@@ -1,4 +1,4 @@
-<div wire:ignore class="flex flex-col md:flex-row gap-10 md:h-[calc(100vh-4rem)]">
+<div wire:ignore.self class="flex flex-col md:flex-row gap-10 md:h-[calc(100vh-4rem)]">
     <div x-data class="mb-10 w-full md:overflow-y-auto p-5">
         <flux:text class="flex gap-2 items-center mb-1">
             <flux:icon class="size-5!" name="chat-bubble-bottom-center-text" />
@@ -15,6 +15,7 @@
                 <flux:tab class="text-base!" name="general">General</flux:tab>
                 {{-- <flux:tab class="text-base!" name="behavior">Behavior</flux:tab> --}}
                 <flux:tab class="text-base!" name="connections">Connections</flux:tab>
+                <flux:tab class="text-base!" name="knowledge">Knowledge</flux:tab>
                 {{-- <flux:tab class="text-base!" name="settings">Settings</flux:tab> --}}
                 {{-- <flux:tab class="text-base!" name="install">Install</flux:tab> --}}
             </flux:tabs>
@@ -23,6 +24,8 @@
             <x-chatbots.wizard.generalTab :$chatbotForm />
 
             <x-chatbots.wizard.connectionTab :chatbot="$chatbot" />
+
+            <x-chatbots.wizard.knowledgeTab :$chatbotForm />
 
             {{--
             <!-- Behavior Tab -->

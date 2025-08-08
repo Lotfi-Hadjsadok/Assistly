@@ -103,14 +103,14 @@ class TrainAIService
         }
     }
 
-    public function getVectorsOfSimilarity($query)
+    public function getVectorsOfSimilarity($query, $chatbot = null)
     {
         try {
             $vector = $this->getEmbedding($query);
             if (empty($vector)) {
                 return [];
             }
-            $vectors = Embedding::getVectorsOfSimilarity($vector)->pluck('content')->toArray();
+            $vectors = Embedding::getVectorsOfSimilarity($vector, $chatbot)->pluck('content')->toArray();
             return $vectors;
         } catch (\Exception $e) {
             Log::error('Error getting vectors of similarity: ' . $e->getMessage());
@@ -129,7 +129,7 @@ class TrainAIService
                     'content' => $item['content'],
                 ];
             }, $memory);
-            $vectors = $this->getVectorsOfSimilarity($message->content);
+            $vectors = $this->getVectorsOfSimilarity($message->content, $chatbot);
             if (empty($vectors)) {
                 return false;
             }

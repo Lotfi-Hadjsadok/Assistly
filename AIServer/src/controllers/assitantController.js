@@ -1,15 +1,9 @@
 import { embeddings, model } from "../utils/models.js";
 import {
-  mainPrompt,
-  notFoundMessage,
-  standalonePrompt,
-  translatePrompt,
+  chatTemplate,
+  contextChatTemplate,
+  standaloneChatTemplate,
 } from "../utils/prompts.js";
-import {
-  ChatPromptTemplate,
-  MessagesPlaceholder,
-  PromptTemplate,
-} from "@langchain/core/prompts";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { sendResponse, sendError } from "../utils/sendResponse.js";
@@ -17,85 +11,78 @@ import { sendResponse, sendError } from "../utils/sendResponse.js";
 export const getEmbedding = async (req, res) => {
   try {
     const { query } = req.body;
+
+    if (!query || typeof query !== "string") {
+      return sendError(res, "Query is required and must be a string", 400);
+    }
+
     const embedding = await embeddings.embedQuery(query);
     sendResponse(res, embedding, "Success", 200);
   } catch (error) {
-    sendError(res, error);
+    console.error("Embedding error:", error);
+    sendError(res, "Failed to generate embedding", 500);
   }
 };
 
 export const getResponse = async (req, res) => {
   try {
-    const { query, vectors, language, memory } = req.body;
+    const { query, chatbot, vectors, language = "en", memory = [] } = req.body;
 
-    const context = vectors.map((v) => v).join("\n");
+    // Determine if context is needed based on vectors presence and content
+    let hasContext = true;
 
-    const promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", mainPrompt],
-      new MessagesPlaceholder("memory"),
-      ["user", "{query}"],
-    ]);
+    let response;
 
-    const standalonePromptTemplate =
-      PromptTemplate.fromTemplate(standalonePrompt);
-
-    const standaloneChain = RunnableSequence.from([
-      standalonePromptTemplate,
+    const standaloneSequence = RunnableSequence.from([
+      standaloneChatTemplate,
       model,
       new StringOutputParser(),
     ]);
 
-    const translatePromptTemplate =
-      PromptTemplate.fromTemplate(translatePrompt);
-
-    const translateChain = RunnableSequence.from([
-      translatePromptTemplate,
-      model,
-      new StringOutputParser(),
-    ]);
-
-    const answerChain = RunnableSequence.from([
-      promptTemplate,
-      model,
-      new StringOutputParser(),
-    ]);
-
-    const chain = RunnableSequence.from([
-      {
-        query: standaloneChain,
-        context: (input) => input.context,
-        memory: (input) => input.memory,
-        notFoundMessage: (input) => input.notFoundMessage,
-        language: (input) => input.language,
-      },
-      {
-        text: answerChain,
-        language: (input) => input.language,
-      },
-      async (input) => {
-        if (input.language === "en") {
-          return input.text;
-        } else {
-          return translateChain.invoke({
-            text: input.text,
-            language: input.language,
-          });
-        }
-      },
-      new StringOutputParser(),
-    ]);
-
-    const response = await chain.invoke({
-      question: query,
+    const standaloneResponse = await standaloneSequence.invoke({
+      query,
       memory,
-      notFoundMessage: notFoundMessage,
-      context,
-      language,
     });
+
+    if (standaloneResponse === "NEEDS_CONTEXT") {
+      hasContext = true;
+    } else {
+      hasContext = false;
+    }
+
+    if (hasContext) {
+      // Use context template when vectors are provided
+      const contextSequence = RunnableSequence.from([
+        contextChatTemplate,
+        model,
+        new StringOutputParser(),
+      ]);
+      response = await contextSequence.invoke({
+        query,
+        memory,
+        context: vectors.join("\n\n"),
+        name: chatbot?.name || "Assistant",
+        not_found: "Contact support.",
+      });
+    } else {
+      // Use regular template when no context is provided
+      const regularSequence = RunnableSequence.from([
+        chatTemplate,
+        model,
+        new StringOutputParser(),
+      ]);
+
+      response = await regularSequence.invoke({
+        query,
+        memory,
+        name: chatbot?.name || "Assistant",
+        not_found: "Contact support.",
+      });
+    }
 
     sendResponse(res, response, "Success", 200);
   } catch (error) {
-    console.log(error);
-    sendError(res, error);
+    console.error("Response generation error:", error);
+    sendError(res, "Failed to generate response", 500);
   }
 };

@@ -7,6 +7,7 @@ import { embeddings } from "../utils/models.js";
 import { splitter, shouldSplit } from "../utils/splitter.js";
 import { sendResponse, sendError } from "../utils/sendResponse.js";
 import dotenv from "dotenv";
+import { normalizeEmbedding } from "../utils/normalizer.js";
 dotenv.config();
 export const embedDocument = async (req, res) => {
   try {
@@ -47,8 +48,6 @@ export const embedDocument = async (req, res) => {
       return total + (chunk.pageContent ? chunk.pageContent.length : 0);
     }, 0);
 
-    console.log(totalCharacters);
-
     const leftCredit = knowledgeCredits - totalCharacters;
 
     if (leftCredit < 0) {
@@ -67,7 +66,7 @@ export const embedDocument = async (req, res) => {
           content: chunk.pageContent,
           metadata: chunk.metadata,
           source: file.originalname,
-          embedding,
+          embedding: normalizeEmbedding(embedding),
         };
       })
     );
@@ -84,5 +83,6 @@ export const embedDocument = async (req, res) => {
   } catch (error) {
     await fs.unlink(file.path);
     sendError(res, error, 500);
+    console.log(error);
   }
 };

@@ -45,7 +45,7 @@ class TrainAIService
                 'urls' => $urls,
                 'knowledgeCredits' => $website->user->knowledge_credits,
             ]);
-            if ($response->failed()) {
+            if ($response->failed() || empty($response->json('vectors'))) {
                 if ($website->was_trained) {
                     $website->update([
                         'status' => KnowledgeStatus::TRAINED_PARTIALLY,
@@ -187,7 +187,7 @@ class TrainAIService
             $document->embeddings()->saveMany($embeddings);
 
             $document->update([
-                'status' => 'trained',
+                'status' => KnowledgeStatus::TRAINED,
                 'trained_at' => now(),
             ]);
 

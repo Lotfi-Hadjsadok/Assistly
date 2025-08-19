@@ -15,3 +15,5 @@ Route::get('/knowledge/docs', function (Request $request) {
 
     return response()->file($file);
 });
+
+

@@ -22,6 +22,7 @@ export async function loadUrl(urls) {
       });
 
       const loadedDocs = await loader.load();
+      console.log(loadedDocs);
 
       for (const doc of loadedDocs) {
         docs.push({
@@ -31,7 +32,6 @@ export async function loadUrl(urls) {
           },
         });
       }
-
     } catch (err) {
       console.warn(`Error loading ${pageUrl}: ${err.message}`);
     }
